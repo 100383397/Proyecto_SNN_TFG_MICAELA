@@ -41,7 +41,7 @@ plt.xlabel('Tiempo (s)')
 plt.savefig('images/%s_spectrogram.png' % input_name)
 spectral_power = 10 * np.log10(pxx)
 
-#Calculamos el espectrograma normalizado (entre 0 y 1)
+#Calculamos el espectrograma normalizado (entre 0 y 1.)
 min_power = np.amin(spectral_power)
 max_power = np.amax(spectral_power)
 power_range = max_power - min_power
