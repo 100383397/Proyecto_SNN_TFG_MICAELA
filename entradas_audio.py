@@ -3,7 +3,7 @@ from mingus.midi import fluidsynth
 from mingus.containers import Note
 
 note_sequences = {}
-note_sequences['one_note'] = ['C-5']
+note_sequences['one_note'] = ['A-5']
 note_sequences['two_notes'] = ['E-5','G-5']
 note_sequences['scale1'] = [ 'C-5','D-5','E-5','F-5','G-5','A-5','B-5']
 note_sequences['scale2'] = [ 'C#-5','D#-5','F#-5','G#-5', 'A#-5',]
