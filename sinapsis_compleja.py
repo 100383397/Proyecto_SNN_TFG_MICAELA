@@ -6,7 +6,24 @@ import matplotlib.pyplot as plt
 N = 10
 G = b2.NeuronGroup(N, 'v:1')
 S = b2.Synapses(G, G)
-S.connect(condition='i!=j', p=0.2)
+
+S.connect(condition='i!=j', p=0.5)
+
+#Otra condición de conectividad que solo conecta las neuronas vecinas seria la siguiente:
+#S.connect(condition='abs(i-j)<4 and i!=j')
+
+#S.connect(j='k for k in range(i-3, i+4) if i!=k', skip_if_invalid=True)
+#n esta otra linea skip_if_invalid evita errores en los limites.
+
+#S.connect(j='i') esta linea conecta cada neurona origen con neurona destino. conectividad 1 a 1
+
+#La imagen generada muestra en ambas gráficas lo mismo de dstinta
+#forma. La de la izquierda tiene las neuronas de origena la izq y las
+#de destino a la derecha y la linea entre las neuronas que tienen
+#sinapsis.
+#Si cambiamos la probabilidad de una conexion se modifican las cifras
+#generadas
+
 
 def visualise_connectivity(S):
     Ns = len(S.source)
