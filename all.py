@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 
 import modules.synapses as synapse_mod
 import modules.neurons as neuron_mod
-import modules.params as param_mod
+
+#b2.set_device('cpp_standalone')
 
 ##################################################################
 ##################################################################
@@ -182,7 +183,7 @@ def init_monitors(neurons, connections, monitor_params):
     return monitors
 
 
-def run_simulation(run_params, neurons, connections, monitors, run_id):
+def run_simulation(run_params, neurons, connections, monitors):
     """
     Run the simulation using all the objects created so far.
     """
@@ -314,7 +315,7 @@ print("done!")
 
     
 print("Running simulation...")
-net = run_simulation(run_params, neurons, connections, monitors, run_id)
+net = run_simulation(run_params, neurons, connections, monitors)
 print("done!")
 
 
