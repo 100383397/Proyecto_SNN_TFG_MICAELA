@@ -109,7 +109,7 @@ def plot_weight_diff(connections, weight_monitor, from_t=0, to_t=-1, newfig=True
     n_neurons = len(neurons)
 
     plt.subplot(n_neurons, 1, 1)
-    plt.title('Weight adjustments for each neuron')
+    plt.title('Ajustes de peso para cada neurona')
 
     from_i = np.where(weight_monitor.t >= from_t * b2.second)[0][0]
     if to_t == -1:
@@ -125,15 +125,44 @@ def plot_weight_diff(connections, weight_monitor, from_t=0, to_t=-1, newfig=True
         plt.subplot(n_neurons, 1, neuron_n+1)
         relevant_weights = connections.j == neuron_n
         diff = weight_diffs[relevant_weights]
-        plt.plot(diff)
+        plt.plot(diff, color='green')
         plt.ylim([min_diff, max_diff])
         plt.yticks([])
         plt.xticks([])
         plt.ylabel("%d" % neuron_n)
-        plt.savefig("figures/0.png")
+    
+###############################################################################
 
+#Definimos gráficas para mostrar el comportamiento de distintos parámetros:
+# potencial de membrana, corriente, threshold...
 
-###########################################################################
+def plot_state_var(monitor, state_vals, firing_neurons, title):
+    plt.figure()
+    n_firing_neurons = len(firing_neurons)
+    min_val = float('inf')
+    max_val = -float('inf')
+    for i, neuron_n in enumerate(firing_neurons):
+        plt.subplot(n_firing_neurons, 1, i+1)
+        neuron_val = state_vals[neuron_n, :]
+        neuron_val_min = np.amin(neuron_val)
+        if neuron_val_min < min_val:
+            min_val = neuron_val_min
+        neuron_val_max = np.amax(neuron_val)
+        if neuron_val_max > max_val:
+            max_val = neuron_val_max
+        plt.plot(monitor.t, neuron_val)
+        plt.ylabel("N. %d" % neuron_n)
+    for i, _ in enumerate(firing_neurons):
+        plt.subplot(n_firing_neurons, 1, i+1)
+        plt.ylim([min_val, max_val])
+        plt.yticks([min_val, max_val])
+    for i in range(len(firing_neurons)-1):
+        plt.subplot(n_firing_neurons, 1, i+1)
+        plt.xticks([])
+    plt.subplot(n_firing_neurons, 1, 1)
+    plt.title(title)
+
+############################################################################
 
 #pickle
 #cpp standalone
@@ -272,14 +301,14 @@ def init_monitors(neurons, connections, monitor_params):
         record=range(len(neurons['layer1e'])),
         dt=timestep
     )
-    if 'layer1vis' in neurons:
+    """if 'layer1vis' in neurons:
         monitors['neurons']['layer1vis'] = b2.StateMonitor(
             neurons['layer1vis'],
             ['v'],
             # record=True is currently broken for standalone simulations
             record=range(len(neurons['layer1vis'])),
             dt=b2.second/60
-        )
+        )"""
 
     conn = connections['input-layer1e']
     n_connections = len(conn.target) * len(conn.source)
@@ -314,6 +343,7 @@ def run_simulation(run_params, neurons, connections, monitors):
 
 
 #########################################################################
+
 
 def analyse_results(monitors, connections, analysis_params):
     """
@@ -353,18 +383,34 @@ def analyse_results(monitors, connections, analysis_params):
 
     plt.xlabel("Time (seconds)")
     plt.tight_layout()
-    plt.savefig("figures/1.png")
 
     if analysis_params['spikes_only']:
         return
 
     firing_neurons = set(monitors['spikes']['layer1e'].i)
+    plot_state_var(
+        monitors['neurons']['layer1e'],
+        monitors['neurons']['layer1e'].ge/b2.siemens,
+        firing_neurons,
+        'Current'
+    )
+    plot_state_var(
+        monitors['neurons']['layer1e'],
+        monitors['neurons']['layer1e'].theta/b2.mV,
+        firing_neurons,
+        'Threshold increase'
+    )
+    plot_state_var(
+        monitors['neurons']['layer1e'],
+        monitors['neurons']['layer1e'].v/b2.mV,
+        firing_neurons,
+        'Membrane potential'
+    )
 
     plot_weight_diff(
         connections['input-layer1e'],
         monitors['connections']['input-layer1e']
     )
-
 
 #########################################################################
 
