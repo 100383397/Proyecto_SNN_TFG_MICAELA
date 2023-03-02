@@ -83,9 +83,57 @@ run_params['no_standalone'] = True
 #     run_params['run_time'] = float(args.run_time) * b2.second
 
 monitor_params = {}
+
 monitor_params['monitors_dt'] = 1000/60.0 * b2.ms
 
-params = (neuron_params, connection_params, monitor_params, run_params)
+analysis_params = {}
+
+analysis_params['save_figs'] = True
+analysis_params['spikes_only'] = False
+analysis_params['note_separation'] = 1 * b2.second
+analysis_params['n_notes'] = 2
+
+params = (neuron_params, connection_params, monitor_params, run_params, analysis_params)
+
+
+####################################################################################
+
+#Grafica que muestra el ajuste de los pesos para cada neurona (diferencias de)
+
+def plot_weight_diff(connections, weight_monitor, from_t=0, to_t=-1, newfig=True):
+    if newfig:
+        plt.figure()
+    else:
+        plt.clf()
+    neurons = set(connections.j)
+    n_neurons = len(neurons)
+
+    plt.subplot(n_neurons, 1, 1)
+    plt.title('Weight adjustments for each neuron')
+
+    from_i = np.where(weight_monitor.t >= from_t * b2.second)[0][0]
+    if to_t == -1:
+        to_i = -1
+    else:
+        to_i = np.where(weight_monitor.t <= to_t * b2.second)[0][-1]
+
+    weight_diffs = weight_monitor.w[:, to_i] - weight_monitor.w[:, from_i]
+    max_diff = np.max(weight_diffs)
+    min_diff = np.min(weight_diffs)
+
+    for neuron_n in neurons:
+        plt.subplot(n_neurons, 1, neuron_n+1)
+        relevant_weights = connections.j == neuron_n
+        diff = weight_diffs[relevant_weights]
+        plt.plot(diff)
+        plt.ylim([min_diff, max_diff])
+        plt.yticks([])
+        plt.xticks([])
+        plt.ylabel("%d" % neuron_n)
+        plt.savefig("figures/0.png")
+
+
+###########################################################################
 
 #pickle
 #cpp standalone
@@ -264,6 +312,60 @@ def run_simulation(run_params, neurons, connections, monitors):
 
     return net
 
+
+#########################################################################
+
+def analyse_results(monitors, connections, analysis_params):
+    """
+    Analyse results of simulation and plot graphs.
+    """
+
+    if len(monitors['spikes']['layer1e']) == 0:
+        print("No spikes detected; not analysing")
+        return
+
+    plt.ion()
+
+    plt.figure()
+
+    plt.subplot(2, 1, 1)
+    plt.title("Input spikes")
+    plt.plot(
+        monitors['spikes']['input'].t/b2.second,
+        monitors['spikes']['input'].i,
+        'k.',
+        markersize=2
+    )
+    plt.ylabel("Neuron no.")
+    plt.grid()
+
+    plt.subplot(2, 1, 2)
+    plt.title("Output spikes")
+    plt.plot(
+        monitors['spikes']['layer1e'].t/b2.second,
+        monitors['spikes']['layer1e'].i,
+        'k.',
+        markersize=2
+    )
+    plt.ylim([-1, max(monitors['spikes']['layer1e'].i)+1])
+    plt.grid()
+    plt.ylabel("Neuron no.")
+
+    plt.xlabel("Time (seconds)")
+    plt.tight_layout()
+    plt.savefig("figures/1.png")
+
+    if analysis_params['spikes_only']:
+        return
+
+    firing_neurons = set(monitors['spikes']['layer1e'].i)
+
+    plot_weight_diff(
+        connections['input-layer1e'],
+        monitors['connections']['input-layer1e']
+    )
+
+
 #########################################################################
 
 
@@ -310,6 +412,25 @@ print("Running simulation...")
 net = run_simulation(run_params, neurons, connections, monitors)
 print("done!")
 
+def save_figures(name):
+    print("Saving figures...")
+    figs = plt.get_fignums()
+    for fig in figs:
+        plt.figure(fig)
+        os.system('rm -f figures/%s_fig_%d.pdf' % (name, fig))
+        plt.savefig('figures/%s_fig_%d.png' % (name, fig))
+    print("done!")
+
+analyse_results(monitors,connections,analysis_params)
+if analysis_params['save_figs']:
+        save_figures(run_id)
+
+"""if run_params['save_results']:
+        print("Saving results...")
+        pickle_results(monitors, run_id)
+        print("done!")"""
+
+
 
 ##################################################################
 ##################################################################
@@ -324,8 +445,7 @@ print("done!")
 #conexiones
 
 ##################################################################
-##################################################################
-
 
 ##################################################################
 ##################################################################
+
