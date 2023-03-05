@@ -29,17 +29,17 @@ import modules.neurons as neuron_mod
 
 neuron_params = {}
 
-neuron_params['v_rest_e'] = -65 * b2.mV #potencial de reposo excitatoria
-neuron_params['v_rest_i'] = -60 * b2.mV #potencial de reposo inhibitoria
-neuron_params['v_reset_e'] = -65 * b2.mV #potencial de reset E
-neuron_params['v_reset_i'] = -45 * b2.mV #potencial de reset I
+neuron_params['v_rest_e'] = -69 * b2.mV #potencial de reposo excitatoria original -65
+neuron_params['v_rest_i'] = -60 * b2.mV #potencial de reposo inhibitoria original -60
+neuron_params['v_reset_e'] = -69 * b2.mV #potencial de reset E original -65
+neuron_params['v_reset_i'] = -45 * b2.mV #potencial de reset I original -45
 neuron_params['v_thresh_e'] = -52 * b2.mV #umbral E
 neuron_params['v_thresh_i'] = -40 * b2.mV #umbral I
 neuron_params['refrac_e'] = 5 * b2.ms #periodo refractario E
 neuron_params['refrac_i'] = 2 * b2.ms #periodo refractario I
 neuron_params['vis'] = False
-neuron_params['tc_v_ex'] = 100 * b2.ms
-neuron_params['tc_v_in'] = 10 * b2.ms
+neuron_params['tc_v_ex'] = 85 * b2.ms #original eran 100 ms
+neuron_params['tc_v_in'] = 5 * b2.ms #origial era 10 ms
 neuron_params['tc_ge'] = 1 * b2.ms
 neuron_params['tc_gi'] = 2 * b2.ms
 # reversal potentials for excitatory neurons
@@ -71,12 +71,12 @@ connection_params['tc_gi'] = 2 * b2.ms
 connection_params['min_theta'] = 0 * b2.mV
 connection_params['max_theta'] = 60 * b2.mV
 connection_params['theta_coef'] = 0.02
-connection_params['ex-in-w'] = 10.4
-connection_params['in-ex-w'] = 17.0
+connection_params['ex-in-w'] = 10.4 #10.4
+connection_params['in-ex-w'] = 17.0 #17.0
 
 run_params = {}
 
-run_params['layer_n_neurons'] = 16 #numero de neuronas en la capa 1
+run_params['layer_n_neurons'] = 12 #numero de neuronas en la capa 1
 run_params['input_spikes_filename'] = 'spikes_inputs/two_notes_1.0_s.pickle'
 run_params['no_standalone'] = True
 # if args.run_time is not None:
