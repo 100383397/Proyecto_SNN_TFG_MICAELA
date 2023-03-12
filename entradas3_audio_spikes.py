@@ -53,13 +53,14 @@ mel_spectral_p_normalised = (mel_spectral_power - min_power)/power_range
 kernel_len = 4
 kernel = np.ones((1, kernel_len))
 mel_spectral_input = ndimage.convolve(mel_spectral_p_normalised, kernel)
-mel_spectral_input[mel_spectral_input < 0.58*kernel_len] = 0
+mel_spectral_input[mel_spectral_input < 0.6*kernel_len] = 0
 
 plt.figure()
 plt.imshow(mel_spectral_input, aspect='auto', origin='lower')
 plt.savefig('images/%s_melspectrogram_spectral_input.png' % input_name)
 
-dt = 100 * b2.ms
+#dt = 30* b2.ms Este es el dt usado para two_notes_1.0_s
+dt = 40 * b2.ms #Este es el dt usado para scale1_1.0_s a  enor dt aparecen mas secuencias de escalas
 sound_input = b2.TimedArray(mel_spectral_input.T, dt=dt)
 
 eqs = '''
