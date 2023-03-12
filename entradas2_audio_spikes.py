@@ -25,16 +25,16 @@ input_name = os.path.basename(input_filename).replace(".wav", "")
 x, sr = librosa.load(input_filename)
 time= librosa.get_duration(y=x, sr=sr)
                      
-#fmin = librosa.midi_to_hz(36)
+fmin = librosa.midi_to_hz(36)
 hop_length = 1024
-C =  np.abs(librosa.cqt(x, sr=sr, n_bins=72,  hop_length=hop_length))
+C =  np.abs(librosa.cqt(x, sr=sr, n_bins=72, fmin = fmin,  hop_length=hop_length))
 
 if args.interactive:
     plt.ion()
 
 logC = librosa.amplitude_to_db(C, ref=np.max)
 plt.figure(figsize=(15, 5))
-librosa.display.specshow(logC, sr=sr, x_axis='time', y_axis='cqt_note')
+librosa.display.specshow(logC, sr=sr, x_axis='time', y_axis='cqt_hz')
 plt.ylabel('Frecuencia (Hz)')
 plt.xlabel('Tiempo (s)')
 plt.colorbar(format='%+2.0f dB')
@@ -42,7 +42,7 @@ plt.title('Constant-Q power spectrum')
 plt.tight_layout()
 plt.savefig('images/%s_chroma_cq.png' % input_name)
 
-chroma_spectral_power = logC
+chroma_spectral_power = logC 
 
 #Calculamos el espectrograma normalizado (entre 0 y 1.)
 min_power = np.amin(chroma_spectral_power)
@@ -54,7 +54,7 @@ chroma_spectral_p_normalised = (chroma_spectral_power - min_power)/power_range
 kernel_len = 4
 kernel = np.ones((1, kernel_len))
 chroma_spectral_input = ndimage.convolve(chroma_spectral_p_normalised, kernel)
-chroma_spectral_input[chroma_spectral_input < 0.7*kernel_len] = 0
+chroma_spectral_input[chroma_spectral_input < 0.68*kernel_len] = 0
 
 plt.figure()
 plt.imshow(chroma_spectral_input, aspect='auto', origin='lower')
