@@ -199,7 +199,7 @@ def init_neurons(input_spikes, layer_n_neurons, neuron_params):
         spike_times=input_spikes['times']
     )
 
-    # Neuronas excitatorias d ela capa 1
+    # Neuronas excitatorias de la capa 1
     neurons['layer1e'] = neuron_mod.excitatory_neurons(
         n_neurons=layer_n_neurons,
         params=neuron_params
