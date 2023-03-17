@@ -1,11 +1,10 @@
 import os
 from mingus.midi import fluidsynth
 from mingus.containers import Note
-import mingus.core.chords as ch
 
-#Este script es empleado para crear los archivos de audio con los que se va a trabajar
-#con la SNN. Se generan arhivos de tipo .wav de secuencias de notas y acordes que se almacenarán
-#en la carpeta audio_inputs
+#Este script se emplea para crear los archivos de audio con los que se va a trabajar
+#con la SNN. Se generan arhivos de tipo .wav de secuencias de notas que se almacenan
+#en la carpeta audios
 
 music_seq = {}
 music_seq['1_note'] = ['A-5']
@@ -18,28 +17,27 @@ s_separation = [0.5, 1, 2]
 
 fluidsynth.init(sf2='FluidR3 GM2-2.SF2')
 
-def play_sequence(sequence, separation_seconds):
-    for note_str in sequence:
-        note = Note(note_str)
+def play_notes_seq(seq, time_seconds):
+    for note_i in seq:
+        note = Note(note_i)
         fluidsynth.play_Note(note)
-        fluidsynth.midi.sleep(seconds=separation_seconds)
+        fluidsynth.midi.sleep(seconds=time_seconds)
         fluidsynth.stop_Note(note)
 
 # Genero audios y los guardo metiendo como entrada las notas con distintas duraciones
 
-temp_n = 1
-for sequence in music_seq:
-    for separation_seconds in s_separation:
-        temp_filename = '/tmp/temp%d.wav' % temp_n
+n = 1
+for seq in music_seq:
+    for time_seconds in s_separation:
+        temp_filename = '/tmp/temp%d.wav' % n
         fluidsynth.midi.start_recording(temp_filename)
         for _ in range(5):
-            play_sequence(music_seq[sequence], separation_seconds)
+            play_notes_seq(music_seq[seq], time_seconds)
 
-        final_filename = \
-            'audio_inputs/%s_%.1f_s.wav' % (sequence, separation_seconds)
+        final_filename = 'audios/%s_%.1f_s.wav' % (seq, time_seconds)
+       
         # colocacion en el canal derecho y mezcla a 16 kHz 
-        os.system("sox %s %s remix 1 rate 16000" % \
-            (temp_filename, final_filename))
-        temp_n += 1
+        os.system("sox %s %s remix 1 rate 16000" % (temp_filename, final_filename))
+        n += 1
 
 
