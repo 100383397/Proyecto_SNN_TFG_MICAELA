@@ -24,17 +24,19 @@ name = os.path.basename(filename).replace(".wav", "")
 
 audio, sr = librosa.load(filename, sr=16000)
 time= librosa.get_duration(y=audio, sr=sr)
-print(time)
 bins = librosa.times_like(audio)
 dt = (bins[1] - bins[0])* b2.second
+
+print(time)
 print(bins)
 print(dt)
 
 n_mels = 512
 Nfft = 2048
-hl= dt * sr/b2.second #modificando esto el bins cambia y afecta al eje temporal de los spikes 372
-print(hl)
+hl= dt * sr/b2.second #modificando esto el bins cambia y afecta al eje temporal de los spikes 372 (16k * 23,22ms)
 hop_length = int(np.round(hl, 0))
+
+print(hl)
 print(hop_length)
 
 S = librosa.feature.melspectrogram(y=audio, sr=sr, n_mels= n_mels, n_fft= Nfft, hop_length=hop_length)
@@ -66,12 +68,11 @@ mel_spectral_pw_norm = (mel_spectral_pw - pw_min)/pw_range
 len = 4
 kernel = np.ones((1, len))
 mel_spectral_input = ndimage.convolve(mel_spectral_pw_norm, kernel)
-mel_spectral_input[mel_spectral_input < 0.63*len] = 0
+mel_spectral_input[mel_spectral_input < 0.65*len] = 0
 
 plt.figure()
 plt.imshow(mel_spectral_input, aspect='auto', origin='lower')
 plt.savefig('images/%s_melspectrogram_spectral_input.png' % name)
-
 
 audio_input = b2.TimedArray(mel_spectral_input.T, dt=dt)
 
