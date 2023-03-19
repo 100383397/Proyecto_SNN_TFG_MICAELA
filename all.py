@@ -77,7 +77,7 @@ connection_params['in-ex-w'] = 17.0 #17.0
 run_params = {}
 
 run_params['layer_n_neurons'] = 12 #numero de neuronas en la capa 1
-run_params['input_spikes_filename'] = 'spikes_inputs/two_notes_1.0_s.pickle'
+run_params['input_spikes_filename'] = 'spikes_inputs/2_notes_1.0_s.pickle'
 run_params['no_standalone'] = True
 # if args.run_time is not None:
 #     run_params['run_time'] = float(args.run_time) * b2.second
