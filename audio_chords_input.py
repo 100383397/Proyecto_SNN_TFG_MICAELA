@@ -12,7 +12,7 @@ from mingus.containers import NoteContainer
 chord = {}
 chord['chord1'] = NoteContainer(['C-3', 'E-3'])
 chord['chord2'] = NoteContainer(['D-3', 'F-3'])
-chord['chord3'] = NoteContainer(['D-4', 'F-4'])
+
 
 s_separation = [0.5, 1, 2]
 
