@@ -494,17 +494,6 @@ def analyse_results(monitors, connections, analysis_params):
     plt.xlabel("Time (seconds)")
     plt.tight_layout()
 
-    if analysis_params['note_separation'] is not None and analysis_params['n_notes'] is not None:
-        end_time = max(monitors['spikes']['layer1e'].t)
-        analyse_note_responses(
-            spike_indices=monitors['spikes']['layer1e'].i,
-            spike_times=monitors['spikes']['layer1e'].t,
-            note_length=analysis_params['note_separation'],
-            n_notes=analysis_params['n_notes'],
-            from_time=end_time/2,
-            to_time=end_time
-        )
-
     if analysis_params['spikes_only']:
         return
 
