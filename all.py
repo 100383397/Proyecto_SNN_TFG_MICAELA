@@ -12,16 +12,10 @@ import tools.analysis as a_mode
 #b2.set_device('cpp_standalone')
 
 ####################################################################################
-# Elproceso de integracion de las neuronas LIF es una especie de tira y afloja
-# de potenciales electricos. El punto clave es que este proceso refleja la
-# fuerza relativa excitatoria vs inhibitoria. Si la excitacion es mas fuerte
-# que la inhibicion, el potencial electrico de la neurona aumenta tal vez 
-# hasta el punto de superar el umbral y disparar un potencial de acción de 
-# salida. Si la inhibición es más fuerte, entonces el potencial eléctrico de 
-# la neurona disminuye, y así se aleja más de superar el umbral para disparar.
-######################################################################################
 
-#parametros usados para: neuronas, conexiones, monitores y correr la ejecucion
+# Primero se definen los parametros usados para: neuronas, conexiones, monitores y
+# para ejecutar la simulación. Asi quedan todos concentrados para que sean más faciles
+# de localizar y modificar.
 
 neurons_vars = {}
 
@@ -31,20 +25,16 @@ neurons_vars['v_reset_e'] = -69 * b2.mV #potencial de reset E original -65
 neurons_vars['v_reset_i'] = -49 * b2.mV #potencial de reset I original -45
 neurons_vars['v_thresh_e'] = -52 * b2.mV #umbral E
 neurons_vars['v_thresh_i'] = -40 * b2.mV #umbral I
-neurons_vars['refrac_e'] = 5 * b2.ms #periodo refractario E
-neurons_vars['refrac_i'] = 2 * b2.ms #periodo refractario I
-neurons_vars['tc_v_ex'] = 85 * b2.ms #original eran 100 ms
-neurons_vars['tc_v_in'] = 5 * b2.ms #origial era 10 ms
-neurons_vars['tc_ge'] = 1 * b2.ms
-neurons_vars['tc_gi'] = 2 * b2.ms
-# reversal potentials for excitatory neurons
-# excitatory reversal potential
-neurons_vars['e_ex_ex'] = 0 * b2.mV
-# inhibitory reversal potential
-neurons_vars['e_in_ex'] = -100 * b2.mV
-# reversal potentials for inhibitory neurons
-neurons_vars['e_ex_in'] = 0 * b2.mV
-neurons_vars['e_in_in'] = -85 * b2.mV
+neurons_vars['refrac_e'] = 6 * b2.ms #periodo refractario E
+neurons_vars['refrac_i'] = 3 * b2.ms #periodo refractario I
+neurons_vars['tc_v_ex'] = 95 * b2.ms #cte tiempo potencial membrana E, original eran 100 ms
+neurons_vars['tc_v_in'] = 5 * b2.ms #cte tiempo poencial membrana I, origial era 10 ms
+neurons_vars['tc_ge'] = 1 * b2.ms #cte tiempo de la conductancia E
+neurons_vars['tc_gi'] = 2 * b2.ms #cte tiempo de la conductancia I
+neurons_vars['e_ex_ex'] = 0 * b2.mV #Potencial de inversion sinaptica excitatorio neuronas excitatorias
+neurons_vars['e_in_ex'] = -100 * b2.mV#Potencial de inversion sinaptica inhibitorio neuronas excitatorias
+neurons_vars['e_ex_in'] = 0 * b2.mV #Potencial de inversion sinaptica excitatoria neuronas inhibitorias
+neurons_vars['e_in_in'] = -86 * b2.mV#Potencial de inversion sinaptica inhibitorio neuronas inhibitorias
 neurons_vars['tc_theta'] = 1e6 * b2.ms
 neurons_vars['min_theta'] = 0 * b2.mV
 neurons_vars['offset'] = 20 * b2.mV
@@ -61,13 +51,13 @@ connect_vars['exp_ee_pre'] = 0.2
 connect_vars['exp_ee_post'] = 0.2
 connect_vars['wmax_ee'] = 1.0
 connect_vars['pre_w_decrease'] = 0.00025
-connect_vars['tc_ge'] = 1 * b2.ms
-connect_vars['tc_gi'] = 2 * b2.ms
+connect_vars['tc_ge'] = 1 * b2.ms #cte tiempo de la conductancia E
+connect_vars['tc_gi'] = 2 * b2.ms #cte tiempo de la conductancia I
 connect_vars['min_theta'] = 0 * b2.mV
 connect_vars['max_theta'] = 60 * b2.mV
 connect_vars['theta_coef'] = 0.02
-connect_vars['ex-in-w'] = 10.4 #10.4
-connect_vars['in-ex-w'] = 17.0 #17.0
+connect_vars['ex-in-w'] = 10.4 #PESO
+connect_vars['in-ex-w'] = 17.0 #PESO
 
 run_vars = {}
 
