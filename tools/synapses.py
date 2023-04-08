@@ -1,5 +1,11 @@
 import brian2 as b2
 
+# Se consideran los modelos de STDP dependientes del tiempo, aunque el potencial y la frecuencia de
+# la membrana postsinaptica modulan el efecto de STDP.
+
+# La implementacion de STDP se lleva a cabo siguiendo el segundo tutorial de Brian, haciendo el cálculo
+# de STDP empleando el sistema de rastreo sinaptico.
+
 def synapses_stdpEX(source, target, connectivity, params):
     syn_params = {
         'tc_pre_ee': params['tc_pre_ee'],

@@ -1,6 +1,28 @@
 import numpy as np
 import brian2 as b2
 
+######################################################################################
+
+# La dinámica temporal del potencial de membrana de la neurona es la primera decision
+# a tomar. En este caso suponiendo que el reconocimiento de los patrones musicales va 
+# a depender mas de la regla de la plasticidad que de la dinamica del potencial de membrana
+# se va a emplear el modelo de integracion y disparo por fuga (LIF), donde el pot de membrana
+# se va a modelar con una ec. diferencial unica. 
+# Este modelo sirve para una neurona, pero nos interesa la conexion de varias neuronas, por 
+# tanto es importante el efecto de una neurona sobre las que esta conectadas (cómo modelar 
+# potencial postsinaptico) y la forma facil de implementar este modelo es considerando los
+# mecanismos biologicos subyacentes, donde los neurotransmisores liberados en el pico 
+# presinaptico cambia la conductancia de la membrana postsinaptica ( no directamente el potencial)
+
+# Elproceso de integracion de las neuronas LIF es una especie de tira y afloja de potenciales
+# electricos. El punto clave es que este proceso refleja la fuerza relativa excitatoria vs 
+# inhibitoria. Si la excitacion es mas fuerte que la inhibicion, el potencial electrico de la 
+# neurona aumenta tal vez  hasta el punto de superar el umbral y disparar un potencial de acción 
+# de salida. Si la inhibición es más fuerte, entonces el potencial eléctrico de la neurona 
+# disminuye, y así se aleja más de superar el umbral para disparar.
+
+######################################################################################
+
 def audio_spike_neurons(n_neurons, spike_i, spike_t):
     
     neurons = b2.SpikeGeneratorGroup(N=n_neurons, indices=spike_i, times=spike_t)
@@ -32,12 +54,16 @@ def neuron_group_excitatory(n_neurons, variables):
 
     thresh_e = 'v > (theta - offset + v_thresh_e)'
 
+    #la corriente producida por la conductancia varía segun las siguientes 2 ecuaciones de I
     neuron_eqs = '''
     I_synE = ge * (e_ex - v) : amp
     I_synI = gi * (e_in - v) : amp
     dge/dt = -ge / tc_ge     : siemens
     dgi/dt = -gi / tc_gi     : siemens
     '''
+
+    #Se emplea inhibicion de corto alcance. Para ello hay que indicar la posicion espacial
+    # de cada neurona en el modelo usando dos variables de estado: x, y
     neuron_eqs_e = neuron_eqs + '''
     dv/dt = ((v_rest - v) + (I_synE + I_synI) * 1 * ohm) / tc_v : volt (unless refractory)
     dtheta/dt = -theta / (tc_theta)                             : volt
@@ -72,7 +98,6 @@ def neuron_group_inhibitory(n_neurons, variables):
         'e_ex': variables['e_ex_in'],
         'e_in': variables['e_in_in'],
         'tc_ge': variables['tc_ge'],
-        'tc_gi': variables['tc_gi'],
         'tc_gi': variables['tc_gi']
     }
         
