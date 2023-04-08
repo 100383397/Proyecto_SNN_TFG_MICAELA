@@ -10,8 +10,10 @@ from mingus.containers import NoteContainer
 # audios
 
 chord = {}
-chord['chord1'] = NoteContainer(['C-3', 'E-3'])
-chord['chord2'] = NoteContainer(['D-3', 'F-3'])
+chord['chord1'] = NoteContainer(['C-4', 'E-4'])
+chord['chord2'] = NoteContainer(['F#-4', 'A-4'])
+chord['chord3'] = NoteContainer(['D-4', 'F-4'])
+chord['chord4'] = NoteContainer(['G-4', 'B-4'])
 
 
 s_separation = [0.5, 1, 2]
@@ -34,6 +36,6 @@ for time_seconds in s_separation:
 
     final_filename = 'audios/chords_%.1f_s.wav' % time_seconds
     
-    # colocacion en el canal derecho y mezcla a 16 kHz 
-    os.system("sox %s %s remix 1 rate 16000" % (temp_filename, final_filename))
+    # colocacion en el canal derecho y mezcla a 44100
+    os.system("sox %s %s remix 1 rate 44100" % (temp_filename, final_filename))
     temp_n += 1

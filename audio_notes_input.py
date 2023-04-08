@@ -40,8 +40,8 @@ for seq in music_seq:
 
         final_filename = 'audios/%s_%.1f_s.wav' % (seq, time_seconds)
        
-        # colocacion en el canal derecho y mezcla a 16 kHz 
-        os.system("sox %s %s remix 1 rate 16000" % (temp_filename, final_filename))
+        # colocacion en el canal derecho y mezcla a 44100 
+        os.system("sox %s %s remix 1 rate 44100" % (temp_filename, final_filename))
         n += 1
 
 
