@@ -10,7 +10,8 @@ import argparse
 from scipy import ndimage
 import librosa
 
-#Cargo los archivos de audio que he creado y grabado con Mingus
+# Se cargan los archivos de audio que se han creado y grabado con Mingus y se lleva a cabo el 
+# preprocesado del audio.
 
 parser = argparse.ArgumentParser()
 parser.add_argument('wav_file')
@@ -31,9 +32,9 @@ print(time)
 print(bins)
 print(dt)
 
-n_mels = 512
+n_mels = 512 
 Nfft = 2048
-hl= dt * sr/b2.second #modificando esto el bins cambia y afecta al eje temporal de los spikes 372 (16k * 23,22ms)
+hl= dt * sr/b2.second #modificando esto, el bins cambia y afecta al eje temporal de los spikes 372 (16k * 23,22ms)
 hop_length = int(np.round(hl, 0))
 
 print(hl)
@@ -52,7 +53,7 @@ img = librosa.display.specshow(S_dB, x_axis='time', y_axis='mel', sr=sr)
 plt.ylabel('Frecuencia (Hz)')
 plt.xlabel('Tiempo (s)')
 plt.colorbar(format='%+2.0f dB')
-plt.title('Constant-Q power spectrum')
+plt.title('Espectrograma de Mel')
 plt.tight_layout()
 plt.savefig('images/%s_melspectrogram.png' % name)
 
@@ -68,7 +69,7 @@ mel_spectral_pw_norm = (mel_spectral_pw - pw_min)/pw_range
 len = 4
 kernel = np.ones((1, len))
 mel_spectral_input = ndimage.convolve(mel_spectral_pw_norm, kernel)
-mel_spectral_input[mel_spectral_input < 0.65*len] = 0
+mel_spectral_input[mel_spectral_input < 0.57*len] = 0
 
 plt.figure()
 plt.imshow(mel_spectral_input, aspect='auto', origin='lower')
@@ -92,11 +93,11 @@ b2.run(time * b2.second, report='stdout')
 print("Listo!")
 
 print("Escribiendo los archivos de los spikes...")
-indices = np.array(spikeR.i)
+inds = np.array(spikeR.i)
 times = np.array(spikeR.t)
 pickle_file = 'spikes_inputs/' +  'melscale_' + name + '.pickle'
 with open(pickle_file, 'wb') as f:
-    pickle.dump((times, indices), f)
+    pickle.dump((times, inds), f)
 print("Listo!")
 
 #Picos repetidos de la misma neurona generaran lineas horizontales

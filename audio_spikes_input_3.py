@@ -10,7 +10,8 @@ import argparse
 from scipy import ndimage
 import librosa
 
-#Cargo los archivos de audio que he creado y grabado con Mingus
+# Se cargan los archivos de audio que se han creado y grabado con Mingus y se lleva a cabo el 
+# preprocesado del audio.
 
 parser = argparse.ArgumentParser()
 parser.add_argument('wav_file')
@@ -20,7 +21,7 @@ args = parser.parse_args()
 filename = args.wav_file
 name = os.path.basename(filename).replace(".wav", "")
 
-#Cargamos el audio haciendo uso de librosa y realizamos un cronograma  de Q constante
+#Cargamos el audio haciendo uso de librosa y realizamos un cromagrama de Q constante
 
 audio, sr = librosa.load(filename, sr= 16000)
 time= librosa.get_duration(y=audio, sr=sr)
@@ -45,10 +46,10 @@ if args.interactive:
 
 plt.figure(figsize=(15, 5))
 librosa.display.specshow(logC, sr=sr, x_axis='time', y_axis='cqt_note')
-plt.ylabel('CQT NOTE')
+plt.ylabel('CQT Note')
 plt.xlabel('Tiempo (s)')
 plt.colorbar(format='%+2.0f dB')
-plt.title('Constant-Q power spectrum')
+plt.title('Espectro de potencia de Q constante')
 plt.tight_layout()
 plt.savefig('images/%s_chroma_cq.png' % name)
 
@@ -89,11 +90,11 @@ b2.run(time * b2.second, report='stdout')
 print("Listo!")
 
 print("Escribiendo los archivos de los spikes...")
-indices = np.array(spikeR.i)
+inds = np.array(spikeR.i)
 times = np.array(spikeR.t)
 pickle_file = 'spikes_inputs/' +  'chroma_' + name + '.pickle'
 with open(pickle_file, 'wb') as f:
-    pickle.dump((times, indices), f)
+    pickle.dump((times, inds), f)
 print("Listo!")
 
 #Picos repetidos de la misma neurona generaran lineas horizontales

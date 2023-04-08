@@ -11,7 +11,8 @@ import pylab
 import argparse
 from scipy import ndimage
 
-#Se cargan los archivos de audio que se han creado y grabado con Mingus.
+# Se cargan los archivos de audio que se han creado y grabado con Mingus y se lleva a cabo el 
+# preprocesado del audio.
 
 parser = argparse.ArgumentParser()
 parser.add_argument('wav_file')
@@ -26,8 +27,10 @@ audio = b2h.loadsound(filename) #Cargamos el audio con Brian2
 if args.interactive:
     plt.ion()
 
+# Primer preprocesado evaluado empleando el espectrograma, con NFFT = 1024
+
 plt.figure()
-(pxx, freqs, bins, im) = pylab.specgram(x=audio[:, 0].flatten(), NFFT=1024, Fs=audio.samplerate, noverlap = 864)
+(pxx, freqs, bins, im) = pylab.specgram(x=audio[:, 0].flatten(), NFFT=1024, Fs=audio.samplerate, noverlap = 583)
 
 num_freqs = len(freqs)
 dt = (bins[1] - bins[0]) #diferencial de tiempo entre los instantes 1 y 0
@@ -38,13 +41,13 @@ print(bins)
 print(dt)
 
 # Relacion entre NFFT y noverlap (-> numero de puntos de superposicion entre bloques)
-# Tenemos 16000 muestras/s (Fs)
-# Tenemos una trama de tamaño 1024 y queremos que se desplace 10 ms ((1024-x)/16000 = 10 ms) -> solapamiento (NOVERLAP) de 864
+# Tenemos 44100 muestras/s (Fs)
+# Tenemos una trama de tamaño 1024 y queremos que se desplace 10 ms ((1024-x)/44100 = 10 ms) -> solapamiento (NOVERLAP) de 583
 
 # Generamos espectrograma del audio de entrada 
-# Las frecuencias van de 0 a 8 kHz en saltos de 10Hz aprox
+# Las frecuencias van de 0 a 22 kHz en saltos de 42,88Hz aprox
 # el número total de frecuencias usadas es 513, numero de neuronas que se inicializará
-# Frecuencia de Muestreo a 16kHz
+# Frecuencia de Muestreo a 44.1kHz
 
 plt.ylabel('Frecuencia (Hz)')
 plt.xlabel('Tiempo (s)')
@@ -62,7 +65,7 @@ spectral_pw_norm = (spectro_pw - pw_min)/pw_range
 len = 4
 kernel = np.ones((1, len))
 spectral_input = ndimage.convolve(spectral_pw_norm, kernel)
-spectral_input[spectral_input < 0.78*len] = 0
+spectral_input[spectral_input < 0.77*len] = 0
 
 plt.figure()
 plt.imshow(spectral_input, aspect='auto', origin='lower')
@@ -91,11 +94,11 @@ b2.run(audio.duration, report='stdout')
 print("Listo!")
 
 print("Escribiendo los archivos de los spikes...")
-indices = np.array(spikeR.i)
+inds = np.array(spikeR.i)
 times = np.array(spikeR.t)
 pickle_file = 'spikes_inputs/' + name + '.pickle'
 with open(pickle_file, 'wb') as f:
-    pickle.dump((times, indices), f)
+    pickle.dump((times, inds), f)
 print("Listo!")
 
 #Picos repetidos de la misma neurona generaran lineas horizontales
