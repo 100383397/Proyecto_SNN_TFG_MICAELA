@@ -73,8 +73,6 @@ analysis_vars = {}
 
 analysis_vars['save_figs'] = True
 analysis_vars['spikes_only'] = True
-analysis_vars['note_separation'] = 1.0 * b2.second
-analysis_vars['n_notes'] = 7
 
 variables = (neurons_vars, connect_vars, mon_vars, run_vars, analysis_vars)
 
@@ -251,17 +249,16 @@ def results_evaluation(monitors, connections, analysis_params):
         print("No spikes detected; not analysing")
         return
     
-    if analysis_params['note_separation'] is not None and \
-            analysis_params['n_notes'] is not None:
-        end_time = max(monitors['spikes']['layer1e'].t)
-        a_mode.analyse_note_responses(
-            spike_indices=monitors['spikes']['layer1e'].i,
-            spike_times=monitors['spikes']['layer1e'].t,
-            note_length=analysis_params['note_separation'],
-            n_notes=analysis_params['n_notes'],
-            from_time=end_time/2,
-            to_time=end_time
-        )
+    end_time = max(monitors['spikes']['layer1e'].t)
+    print(end_time)
+    start_time = min(monitors['spikes']['layer1e'].t)
+    print(start_time)
+    a_mode.analyse_note_responses(
+        spike_indices=monitors['spikes']['layer1e'].i,
+        spike_times=monitors['spikes']['layer1e'].t,
+        from_time=start_time,
+        to_time=end_time
+    )
         
     plt.ion()
 
@@ -317,7 +314,7 @@ def results_evaluation(monitors, connections, analysis_params):
         'Membrane potential'
     )
 
-    a_mode.plot_weight_diff(
+    a_mode.w_diff(
         connections['input-layer1e'],
         monitors['connections']['input-layer1e']
     )
