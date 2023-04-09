@@ -2,10 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import brian2 as b2
 
+# Este script recoge las funciones empleadas para mostrar los resultádos tanto gráficos como
+# cuantitativos
 
 #Grafica que muestra el ajuste de los pesos para cada neurona (diferencias de pesos)
 
-def plot_weight_diff(connections, weight_monitor, from_t=0, to_t=-1, newfig=True):
+def w_diff(connections, weight_monitor, from_t=0, to_t=-1, newfig=True):
     if newfig:
         plt.figure()
     else:
@@ -16,10 +18,13 @@ def plot_weight_diff(connections, weight_monitor, from_t=0, to_t=-1, newfig=True
     plt.subplot(n_neurons, 1, 1)
     plt.title('Ajustes de peso para cada neurona')
 
+    # Donde el tiempo del monitor de los pesos es mayor de 0s
+
     from_i = np.where(weight_monitor.t >= from_t * b2.second)[0][0]
     if to_t == -1:
         to_i = -1
     else:
+        # Donde el tiempo del monitor de los pesos es menor de -1s
         to_i = np.where(weight_monitor.t <= to_t * b2.second)[0][-1]
 
     weight_diffs = weight_monitor.w[:, to_i] - weight_monitor.w[:, from_i]
@@ -95,42 +100,51 @@ def plot_state_var(monitor, state_vals, firing_neurons, title):
 
 #####################################################################################
 
-# Funcion para analizar la respuesta a las notas y calcular el porcentaje de acierto y fallo
-# de la red
+# Funcion para analizar la respuesta de los spikes de las neuronas frente a las notas de entrada
 
-def analyse_note_responses(spike_indices, spike_times,
-                           note_length, n_notes, from_time, to_time):
+def analyse_note_responses(spike_indices, spike_times,from_time, to_time):
     
-    max_time = np.amax(spike_times) * b2.second
-    from_time = max_time/2
-    to_time = max_time
-    note_length = 1.0
+    note_length = 1.0  #Distancia entre las notas en segundos
+    n_notes = 7 #numero de notas analizadas
 
-    n_notes = 7
-    max_spikes = 0
+    # Para cada neurona, se consideran sus instantes de tiempo relevantes cuando se recorren 
+    # los tiempos de los disparos registrados y ese indice de ese instante de tiempo coincide
+    # con el indice de neurona evaluada ( se recorre con el for).
+
+    # - Ej: se toma el tiempo en segundos de spike_times(spike indice 0 = neurona numero 0),
+    #   y esos tiempos donde coincidan los indices serán los tiempos de disparo de la neurona 0
+
+    # Y tambien son tiempos relevantes si estos tiempos de los indices coincidentes están entre
+    #  el tiempo minimo y maximo de los disparos. (el primero que se produce y el último)
+
     for neuron_n in set(spike_indices):
-        relevant_spike_times = spike_times[spike_indices == neuron_n]
-        relevant_spike_times = [t for t in relevant_spike_times if t > from_time and t < to_time]
-        n_spikes = len(relevant_spike_times)
-        if n_spikes > max_spikes:
-            max_spikes = n_spikes
-    print("done!")
-    favourite_notes = {}
-    for neuron_n in set(spike_indices):
+
         relevant_spike_times = spike_times[spike_indices == neuron_n]
         relevant_spike_times = [t for t in relevant_spike_times if t > from_time and t < to_time]
         relevant_spike_times = np.array(relevant_spike_times)
-        n_spikes = len(relevant_spike_times)
-        if n_spikes == 0 or n_spikes < 0.2 * max_spikes:
-            continue
+        
+        # Convertimos el array de los tiempos relevantes de disparo de cada neurona entre
+        # el tiempo que dura cada nota, a solo los enteros (tipo int) y calculamos el aray de restos 
+        # del array de tiempos tipo int entre el numero total de notas distintas que contiene 
+        # el audio de entrada.
 
         note_bin_firings = np.floor(relevant_spike_times / note_length).astype(int)
         note_responses = np.mod(note_bin_firings, n_notes)
+        print(note_bin_firings)
+        print(note_responses)
+
+        # Cuento el numero de ocurrencias de cada resto de tiempo y el máximo va a ser la nota más comun
+        # a la qu eesa neurona dispara en su presencia.
         most_common_note = np.argmax(np.bincount(note_responses))
+        print(most_common_note)
+
+        #De forma que el numero de disparos correctos es la suma de los restos que son iguales a la nota comun
         n_correct_firings = sum(note_responses == most_common_note)
+
+        # Se calcula el porcentaje como el numero de disparos correctos / disparos totales * 100
         success_firing_pct = float(n_correct_firings) / len(note_responses) * 100
+        
         print("Neuron %d likes note %d, %.1f%% success" \
             % (neuron_n, most_common_note, success_firing_pct))
-        favourite_notes[neuron_n] = most_common_note
-
-    return favourite_notes
+       
+    return 
