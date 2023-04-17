@@ -62,7 +62,7 @@ connect_vars['in-ex-w'] = 17.0 #PESO
 run_vars = {}
 
 run_vars['layer_n_neurons'] = 12 #numero de neuronas en la capa 1
-run_vars['input_spikes_filename'] = 'spikes_inputs/melscale_scale1_1.0_s.pickle'
+run_vars['input_spikes_filename'] = 'spikes_inputs/melscale_4_notes_0.5_s.pickle'
 run_vars['no_standalone'] = True
 
 mon_vars = {}
@@ -72,7 +72,6 @@ mon_vars['monitors_dt'] = 1000/60.0 * b2.ms
 analysis_vars = {}
 
 analysis_vars['save_figs'] = True
-analysis_vars['spikes_only'] = True
 
 variables = (neurons_vars, connect_vars, mon_vars, run_vars, analysis_vars)
 
@@ -150,16 +149,17 @@ def initialize_conn(neurons, connect_vars):
     )
 
     #asignamos peso inicial aleatorio para la conexion entrada - excitatoria 1
-
-    conns['input-layer1e'].w = 'rand() * 0.4'
-    weights = np.array(conns['input-layer1e'].w)
- 
-    print(weights)
-    #guardo los pesos por si necesito trabajar con ellos
-    np.savetxt('evaluation/weights.out', weights) 
-
-    with open('input-layer1e-weights.pickle', 'wb') as pickle_file:
-        pickle.dump(weights, pickle_file)
+    if os.path.exists('input-layer1e-weights.pickle'):
+        with open('input-layer1e-weights.pickle', 'rb') as pickle_file:
+            pickle_obj = pickle.load(pickle_file)
+        conns['input-layer1e'].w = pickle_obj
+    else:
+        conns['input-layer1e'].w = 'rand() * 0.4'
+        #weights = np.array(conns['input-layer1e'].w)
+        #guardo los pesos por si necesito trabajar con ellos
+        #np.savetxt('evaluation/weights.out', weights) 
+        #with open('input-layer1e-weights.pickle', 'wb') as pickle_file:
+         #   pickle.dump(weights, pickle_file)
 
     # conexion excitatory to inhibitory
     conns['layer1e-layer1i'] = s_mode.synapses_non_plastic(
@@ -290,9 +290,6 @@ def results_evaluation(monitors, connections, analysis_params):
     plt.xlabel("Time (seconds)")
     plt.tight_layout()
 
-    if analysis_params['spikes_only']:
-        return
-
     firing_neurons = set(monitors['spikes']['layer1e'].i)
 
     a_mode.plot_state_var(
@@ -321,7 +318,7 @@ def results_evaluation(monitors, connections, analysis_params):
 
     #Para visualizar los pesos, para cada nuerona tomamos los pesos mas relevantes
 
-    a_mode.plot_weight(connections['input-layer1e'])
+    #a_mode.plot_weight(connections['input-layer1e'])
 
 
 #########################################################################
@@ -368,6 +365,13 @@ print("done!")
     
 print("Running simulation...")
 net = run_simulation(run_vars, neurons, connections, monitors)
+guardar = False
+if(guardar== True):
+    weights = np.array(connections['input-layer1e'].w)
+        #guardo los pesos por si necesito trabajar con ellos
+    np.savetxt('evaluation/weights.out', weights) 
+    with open('input-layer1e-weights.pickle', 'wb') as pickle_file:
+        pickle.dump(weights, pickle_file)
 print("done!")
 
 
@@ -376,7 +380,6 @@ def save_figures(name):
     figs = plt.get_fignums()
     for fig in figs:
         plt.figure(fig)
-        os.system('rm -f figures/%s_fig_%d.pdf' % (name, fig))
         plt.savefig('figures/%s_fig_%d.png' % (name, fig))
     print("done!")
 
@@ -384,6 +387,7 @@ results_evaluation(monitors,connections,analysis_vars)
 
 if analysis_vars['save_figs']:
         save_figures(run_id)
+
 
 
 #############################################################################################33
