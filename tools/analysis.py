@@ -5,6 +5,8 @@ import brian2 as b2
 # Este script recoge las funciones empleadas para mostrar los resultádos tanto gráficos como
 # cuantitativos
 
+##########################################################################################
+
 #Grafica que muestra el ajuste de los pesos para cada neurona (diferencias de pesos)
 
 def w_diff(connections, weight_monitor, from_t=0, to_t=-1, newfig=True):
@@ -21,6 +23,7 @@ def w_diff(connections, weight_monitor, from_t=0, to_t=-1, newfig=True):
     # Donde el tiempo del monitor de los pesos es mayor de 0s
 
     from_i = np.where(weight_monitor.t >= from_t * b2.second)[0][0]
+
     if to_t == -1:
         to_i = -1
     else:
@@ -48,11 +51,17 @@ def w_diff(connections, weight_monitor, from_t=0, to_t=-1, newfig=True):
 #####################################################################################
 
 #Funcion para mostrar los pesos de cada neurona sin hacer la diferencia 
-
-def plot_weight(connections):
-
+'''
+def plot_weight(connections, weight_monitor, from_t=0, to_t=-1, newfig=True):
+    if newfig:
+        plt.figure()
+    else:
+        plt.clf()
+    plt.subplot(n_neurons, 1, 1)
     plt.title('Progresion de pesos para cada neurona')
     plt.figure()
+    neurons = set(connections.j)
+    n_neurons = len(neurons)
     for i in range(12):
         plt.subplot(12, 1, i+1)
         relevant_weights = connections['input-layer1e'].j == i
@@ -62,7 +71,7 @@ def plot_weight(connections):
         plt.yticks([])
         plt.xticks([])
         plt.ylabel("%d" % i)
-    plt.savefig('evaluation/weights.png')
+    plt.savefig('evaluation/weights.png')'''
 
 ########################################################################################
 
@@ -104,8 +113,8 @@ def plot_state_var(monitor, state_vals, firing_neurons, title):
 
 def analyse_note_responses(spike_indices, spike_times,from_time, to_time):
     
-    note_length = 1.0  #Distancia entre las notas en segundos
-    n_notes = 7 #numero de notas analizadas
+    note_length = 0.5  #Distancia entre las notas en segundos
+    n_notes = 4 #numero de notas analizadas
 
     # Para cada neurona, se consideran sus instantes de tiempo relevantes cuando se recorren 
     # los tiempos de los disparos registrados y ese indice de ese instante de tiempo coincide
@@ -123,28 +132,29 @@ def analyse_note_responses(spike_indices, spike_times,from_time, to_time):
         relevant_spike_times = [t for t in relevant_spike_times if t > from_time and t < to_time]
         relevant_spike_times = np.array(relevant_spike_times)
         
-        # Convertimos el array de los tiempos relevantes de disparo de cada neurona entre
-        # el tiempo que dura cada nota, a solo los enteros (tipo int) y calculamos el aray de restos 
-        # del array de tiempos tipo int entre el numero total de notas distintas que contiene 
-        # el audio de entrada.
+        # Convertimos el array que almacena los tiempos relevantes de disparo de cada neurona entre
+        # el tiempo que dura cada nota, a solo los enteros (tipo int) de la primera repeticion de las 
+        # notas, y calculamos el array de restos (modulo) del array de tiempos tipo int entre el numero 
+        # total de notas distintas.
 
         note_bin_firings = np.floor(relevant_spike_times / note_length).astype(int)
-        note_responses = np.mod(note_bin_firings, n_notes)
-        print(note_bin_firings)
-        print(note_responses)
+        note_responses=0
+        if(len(note_bin_firings) > 20):
+            note_responses = np.mod(note_bin_firings, n_notes) 
+        #print(note_bin_firings)
+        #print(note_responses)
 
         # Cuento el numero de ocurrencias de cada resto de tiempo y el máximo va a ser la nota más comun
         # a la qu eesa neurona dispara en su presencia.
-        most_common_note = np.argmax(np.bincount(note_responses))
-        print(most_common_note)
+            most_common_note = np.argmax(np.bincount(note_responses))
 
         #De forma que el numero de disparos correctos es la suma de los restos que son iguales a la nota comun
-        n_correct_firings = sum(note_responses == most_common_note)
-
-        # Se calcula el porcentaje como el numero de disparos correctos / disparos totales * 100
-        success_firing_pct = float(n_correct_firings) / len(note_responses) * 100
+            n_correct_firings = sum(note_responses == most_common_note)
         
-        print("Neuron %d likes note %d, %.1f%% success" \
-            % (neuron_n, most_common_note, success_firing_pct))
+        # Se calcula el porcentaje como el numero de disparos correctos / disparos totales * 100
+            success_firing_pct = float(n_correct_firings) / len(note_responses) * 100
+        
+            print("Neuron %d likes note %d, %.1f%% success" \
+                % (neuron_n, most_common_note, success_firing_pct))
        
     return 
