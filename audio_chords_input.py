@@ -1,3 +1,4 @@
+
 import os
 from mingus.midi import fluidsynth
 from mingus.containers import NoteContainer 
@@ -11,10 +12,9 @@ from mingus.containers import NoteContainer
 
 chord = {}
 chord['chord1'] = NoteContainer(['C-4', 'E-4'])
-chord['chord2'] = NoteContainer(['F#-4', 'A-4'])
-chord['chord3'] = NoteContainer(['D-4', 'F-4'])
-chord['chord4'] = NoteContainer(['G-4', 'B-4'])
-
+chord['chord2'] = NoteContainer(['F-4', 'Ab-4'])
+chord['chord3'] = NoteContainer(['D-4', 'F#-4'])
+chord['chord4'] = NoteContainer(['G-4', 'Bb-4'])
 
 s_separation = [0.5, 1, 2]
 
@@ -29,13 +29,13 @@ def play_chord_seq(chord, time_seconds):
 # Generamos los audios y los guardamos
 temp_n = 1
 for time_seconds in s_separation:
-    temp_filename = '/tmp/temp%d.wav' % temp_n
-    fluidsynth.midi.start_recording(temp_filename)
+    aux_name_file = '/tmp/temp%d.wav' % temp_n
+    fluidsynth.midi.start_recording(aux_name_file)
     for _ in range(3):
         play_chord_seq(chord, time_seconds)
 
     final_filename = 'audios/chords_%.1f_s.wav' % time_seconds
     
     # colocacion en el canal derecho y mezcla a 44100
-    os.system("sox %s %s remix 1 rate 44100" % (temp_filename, final_filename))
+    os.system("sox %s %s remix 1 rate 44100" % (aux_name_file, final_filename))
     temp_n += 1
