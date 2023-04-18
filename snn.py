@@ -167,7 +167,7 @@ def initialize_conn(neurons, connect_vars):
     )
     conns['layer1e-layer1i'].w = connect_vars['ex-in-w']
 
-    # COnexion inhibitoria a excitatoria
+    # Conexion inhibitoria a excitatoria
     conns['layer1i-layer1e'] = s_mode.synapses_non_plastic(
         source=neurons['layer1i'],
         target=neurons['layer1e'],
