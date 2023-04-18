@@ -1,3 +1,4 @@
+
 import numpy as np
 import matplotlib.pyplot as plt
 import brian2 as b2
@@ -7,7 +8,7 @@ import brian2 as b2
 
 ##########################################################################################
 
-#Grafica que muestra el ajuste de los pesos para cada neurona (diferencias de pesos)
+#Grafica que muestra el ajuste de los pesos entre instantes para cada neurona (diferencias de pesos)
 
 def w_diff(connections, weight_monitor, from_t=0, to_t=-1, newfig=True):
     if newfig:
@@ -21,20 +22,19 @@ def w_diff(connections, weight_monitor, from_t=0, to_t=-1, newfig=True):
     plt.title('Ajustes de peso para cada neurona')
 
     # Donde el tiempo del monitor de los pesos es mayor de 0s
-
     from_i = np.where(weight_monitor.t >= from_t * b2.second)[0][0]
 
     if to_t == -1:
         to_i = -1
     else:
-        # Donde el tiempo del monitor de los pesos es menor de -1s
+    # Donde el tiempo del monitor de los pesos es menor de -1s
         to_i = np.where(weight_monitor.t <= to_t * b2.second)[0][-1]
 
     weight_diffs = weight_monitor.w[:, to_i] - weight_monitor.w[:, from_i]
     max_diff = np.max(weight_diffs)
     min_diff = np.min(weight_diffs)
 
-    #guardo las diferencias de  pesos por si necesito trabajar con ellos
+    #Guardo las diferencias de  pesos por si necesito trabajar con ellos
     np.savetxt('evaluation/weight_diffs.out', weight_diffs)
 
     for neuron_n in neurons:
@@ -47,31 +47,6 @@ def w_diff(connections, weight_monitor, from_t=0, to_t=-1, newfig=True):
         plt.xticks([])
         plt.ylabel("%d" % neuron_n)
     plt.savefig('evaluation/weights_diff.png')
-
-#####################################################################################
-
-#Funcion para mostrar los pesos de cada neurona sin hacer la diferencia 
-'''
-def plot_weight(connections, weight_monitor, from_t=0, to_t=-1, newfig=True):
-    if newfig:
-        plt.figure()
-    else:
-        plt.clf()
-    plt.subplot(n_neurons, 1, 1)
-    plt.title('Progresion de pesos para cada neurona')
-    plt.figure()
-    neurons = set(connections.j)
-    n_neurons = len(neurons)
-    for i in range(12):
-        plt.subplot(12, 1, i+1)
-        relevant_weights = connections['input-layer1e'].j == i
-        weights = np.array(connections['input-layer1e'].w)[relevant_weights]
-        plt.plot(weights, color= 'red')
-        plt.ylim([0, 1])
-        plt.yticks([])
-        plt.xticks([])
-        plt.ylabel("%d" % i)
-    plt.savefig('evaluation/weights.png')'''
 
 ########################################################################################
 
@@ -137,24 +112,53 @@ def analyse_note_responses(spike_indices, spike_times,from_time, to_time):
         # notas, y calculamos el array de restos (modulo) del array de tiempos tipo int entre el numero 
         # total de notas distintas.
 
-        note_bin_firings = np.floor(relevant_spike_times / note_length).astype(int)
+        note_firings_int = np.floor(relevant_spike_times / note_length).astype(int)
+
+        # Con este if excluimos del análisis aquellas neuronas que no deberían dispararse y generan picos
+        # muy esporádicos
+
         note_responses=0
-        if(len(note_bin_firings) > 20):
-            note_responses = np.mod(note_bin_firings, n_notes) 
+        if(len(note_firings_int) > 20):
+            note_responses = np.mod(note_firings_int, n_notes) 
         #print(note_bin_firings)
         #print(note_responses)
 
         # Cuento el numero de ocurrencias de cada resto de tiempo y el máximo va a ser la nota más comun
-        # a la qu eesa neurona dispara en su presencia.
-            most_common_note = np.argmax(np.bincount(note_responses))
+        # a la que esa neurona dispara en su presencia.
+            final_note = np.argmax(np.bincount(note_responses))
 
         #De forma que el numero de disparos correctos es la suma de los restos que son iguales a la nota comun
-            n_correct_firings = sum(note_responses == most_common_note)
+            n_correct_firings = sum(note_responses == final_note)
         
         # Se calcula el porcentaje como el numero de disparos correctos / disparos totales * 100
             success_firing_pct = float(n_correct_firings) / len(note_responses) * 100
         
             print("Neuron %d likes note %d, %.1f%% success" \
-                % (neuron_n, most_common_note, success_firing_pct))
+                % (neuron_n, final_note, success_firing_pct))
        
     return 
+
+#####################################################################################
+
+#Funcion para mostrar los pesos de cada neurona sin hacer la diferencia 
+'''
+def plot_weight(connections, weight_monitor, from_t=0, to_t=-1, newfig=True):
+    if newfig:
+        plt.figure()
+    else:
+        plt.clf()
+    plt.subplot(n_neurons, 1, 1)
+    plt.title('Progresion de pesos para cada neurona')
+    plt.figure()
+    neurons = set(connections.j)
+    n_neurons = len(neurons)
+    for i in range(12):
+        plt.subplot(12, 1, i+1)
+        relevant_weights = connections['input-layer1e'].j == i
+        weights = np.array(connections['input-layer1e'].w)[relevant_weights]
+        plt.plot(weights, color= 'red')
+        plt.ylim([0, 1])
+        plt.yticks([])
+        plt.xticks([])
+        plt.ylabel("%d" % i)
+    plt.savefig('evaluation/weights.png')'''

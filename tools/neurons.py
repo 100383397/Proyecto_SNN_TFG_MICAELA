@@ -1,3 +1,4 @@
+
 import numpy as np
 import brian2 as b2
 
@@ -80,11 +81,10 @@ def neuron_group_excitatory(n_neurons, variables):
         refractory=variables['refrac_e'],
         reset=reset_e,
         namespace=neurons_vars,
-        method='euler' # automatically suggested by Brian
+        method='euler' 
     )
     neurons.v = variables['v_rest_e']
-    neurons.theta = \
-        np.ones((n_neurons)) * variables['offset']
+    neurons.theta = np.ones((n_neurons)) * variables['offset']
     neurons.theta_mod = np.ones((n_neurons))
 
     return neurons
@@ -126,7 +126,7 @@ def neuron_group_inhibitory(n_neurons, variables):
         refractory=variables['refrac_i'], 
         reset=reset_i,
         namespace=neurons_vars,
-        method='euler' # automatically suggested by Brian
+        method='euler' 
     )
     neurons.v = variables['v_rest_i']
 

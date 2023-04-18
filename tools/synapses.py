@@ -1,3 +1,4 @@
+
 import brian2 as b2
 
 # Se consideran los modelos de STDP dependientes del tiempo, aunque el potencial y la frecuencia de
@@ -47,9 +48,8 @@ def synapses_stdpEX(source, target, connectivity, params):
 
     synapses.connect(connectivity)
 
-   
-
     return synapses
+
 
 def synapses_non_plastic(source, target, connectivity, synapse_type):
     if synapse_type == 'excitatory':
