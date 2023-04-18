@@ -1,4 +1,3 @@
-##!/usr/bin/env python
 
 from __future__ import print_function, division
 import brian2 as b2
@@ -28,6 +27,10 @@ if args.interactive:
     plt.ion()
 
 # Primer preprocesado evaluado empleando el espectrograma, con NFFT = 1024
+# Relacion entre NFFT y noverlap (-> numero de puntos de superposicion entre bloques)
+# Tenemos 44100 muestras/s (Fs)
+# Tenemos una trama de tamaño 1024 y queremos que se desplace 10 ms 
+# ((1024-x)/44100 = 10 ms) -> solapamiento (NOVERLAP) de 583
 
 plt.figure()
 (pxx, freqs, bins, im) = pylab.specgram(x=audio[:, 0].flatten(), NFFT=1024, Fs=audio.samplerate, noverlap = 583)
@@ -35,22 +38,19 @@ plt.figure()
 num_freqs = len(freqs)
 dt = (bins[1] - bins[0]) #diferencial de tiempo entre los instantes 1 y 0
 
-print(freqs)
-print(num_freqs)
-print(bins)
-print(dt)
-
-# Relacion entre NFFT y noverlap (-> numero de puntos de superposicion entre bloques)
-# Tenemos 44100 muestras/s (Fs)
-# Tenemos una trama de tamaño 1024 y queremos que se desplace 10 ms ((1024-x)/44100 = 10 ms) -> solapamiento (NOVERLAP) de 583
-
 # Generamos espectrograma del audio de entrada 
 # Las frecuencias van de 0 a 22 kHz en saltos de 42,88Hz aprox
 # el número total de frecuencias usadas es 513, numero de neuronas que se inicializará
 # Frecuencia de Muestreo a 44.1kHz
 
+#print(freqs)
+#print(num_freqs)
+#print(bins)
+#print(dt)
+
 plt.ylabel('Frecuencia (Hz)')
 plt.xlabel('Tiempo (s)')
+plt.title('Espectrograma')
 plt.savefig('images/%s_spectrogram.png' % name)
 
 spectro_pw = 10 * np.log10(pxx) #Pasamos a dB
@@ -77,14 +77,14 @@ plt.savefig('images/%s_spectral_input.png' % name)
 
 audio_input = b2.TimedArray(spectral_input.T, dt=dt)
 
-eqs = '''
+eqs_model = '''
 dv/dt = (I-v)/(10*ms) : 1
 I = audio_input(t, i): 1
 '''
 
 # Se crea un grupo de neuronas (513) que comparten las mismas ecuaciones que definen sus propiedades
 # dt: paso de tiempo que se emplea para la simulación
-neuronG = b2.NeuronGroup(N=num_freqs, model=eqs, reset='v=0', threshold='v>1', dt = dt/10)
+neuronG = b2.NeuronGroup(N=num_freqs, model=eqs_model, reset='v=0', threshold='v>1', dt = dt/10)
 
 #Registramos los picos generados 
 spikeR = b2.SpikeMonitor(neuronG)
@@ -108,6 +108,7 @@ plt.plot(spikeR.t/b2.second, spikeR.i, 'k.', markersize=1)
 plt.ylim([0, num_freqs])
 plt.ylabel('Numero de neuronas aferentes')
 plt.xlabel('Tiempo (s)')
+plt.title('Spike Monitor de neuronas de entrada')
 plt.savefig('images/spectrogram_%s_spikes.png' % name)
 
 #Para poder traducir las entradas de audio a picos una opción es hacer una TF del audio

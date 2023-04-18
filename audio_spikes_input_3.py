@@ -1,4 +1,3 @@
-##!/usr/bin/env python
 
 from __future__ import print_function, division
 import brian2 as b2
@@ -26,17 +25,11 @@ name = os.path.basename(filename).replace(".wav", "")
 audio, sr = librosa.load(filename, sr= 16000)
 time= librosa.get_duration(y=audio, sr=sr)
 bins = librosa.times_like(audio)
+
 dt = (bins[1] - bins[0])* b2.second
-
-print(time)
-print(bins)
-print(dt)  
-
 fmin = librosa.midi_to_hz(36)
 hop_length = 2048
 n_bins = 72
-
-print(hop_length)
 
 C =  np.abs(librosa.cqt(audio, sr=sr, n_bins= n_bins, fmin = fmin,  hop_length=hop_length))
 logC = librosa.amplitude_to_db(C, ref=np.max)
@@ -49,7 +42,7 @@ librosa.display.specshow(logC, sr=sr, x_axis='time', y_axis='cqt_note')
 plt.ylabel('CQT Note')
 plt.xlabel('Tiempo (s)')
 plt.colorbar(format='%+2.0f dB')
-plt.title('Espectro de potencia de Q constante')
+plt.title('Cromagrama de Q constante')
 plt.tight_layout()
 plt.savefig('images/%s_chroma_cq.png' % name)
 
@@ -71,16 +64,17 @@ plt.figure()
 plt.imshow(chroma_spectral_input, aspect='auto', origin='lower')
 plt.savefig('images/%s_chroma_cq_spectral_input.png' % name)
 
+# Ahora se traducen los audios de entrada en una serie de picos mediante Brian2
+
 audio_input = b2.TimedArray(chroma_spectral_input.T, dt=dt)
 
-eqs = '''
+eqs_model = '''
 dv/dt = (I-v)/(10*ms) : 1
 I = audio_input(t, i): 1
 '''
 
-# SE crea un grupo de neuronas (513) que comparten las mismas ecuaciones que 
-# definen sus propiedades
-neuronG = b2.NeuronGroup(N=n_bins, model=eqs, reset='v=0', threshold='v>1', dt = dt/1000)
+# SE crea un grupo de neuronas que comparten las mismas ecuaciones que definen sus propiedades
+neuronG = b2.NeuronGroup(N=n_bins, model=eqs_model, reset='v=0', threshold='v>1', dt = dt/1000)
 
 #Registramos los picos generados 
 spikeR = b2.SpikeMonitor(neuronG)
@@ -104,8 +98,8 @@ plt.plot(spikeR.t/b2.second, spikeR.i, 'k.', markersize=1)
 plt.ylim([0, n_bins])
 plt.ylabel('Numero de neuronas aferentes')
 plt.xlabel('Tiempo (s)')
+plt.title('Spike Monitor de neuronas de entrada')
 plt.savefig('images/chroma_cq_%s_spikes.png' % name)
-
 
 #Para poder traducir las entradas de audio a picos una opción es hacer una TF del audio
 #(o mas preciso calcular la densidad espectral de potencia) y usar la potencia 
