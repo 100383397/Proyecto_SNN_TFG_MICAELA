@@ -9,13 +9,10 @@ import tools.synapses as s_mode
 import tools.neurons as n_mode
 import tools.analysis as a_mode
 
-#b2.set_device('cpp_standalone')
-
 ####################################################################################
 
 # Primero se definen los parametros usados para: neuronas, conexiones, monitores y
-# para ejecutar la simulación. Asi quedan todos concentrados para que sean más faciles
-# de localizar y modificar.
+# para ejecutar la simulación.
 
 neurons_vars = {}
 
@@ -61,7 +58,7 @@ connect_vars['in-ex-w'] = 17.0 #PESO
 
 run_vars = {}
 
-run_vars['layer_n_neurons'] = 12 #numero de neuronas en la capa 1
+run_vars['layer_n_neurons'] = 12 #numero de neuronas de salida
 run_vars['input_spikes_filename'] = 'spikes_inputs/melscale_4_notes_0.5_s.pickle'
 run_vars['no_standalone'] = True
 
@@ -86,7 +83,7 @@ variables = (neurons_vars, connect_vars, mon_vars, run_vars, analysis_vars)
 
 def load_audio_input(run_vars):
     
-    #Cargamos los spikes para usarlos como entrada a la red neuronal 
+    #Cargamos los spikes del audio preprocesado para usarlos como entrada a la red neuronal 
 
     pickle_filename = run_vars['input_spikes_filename']
     with open(pickle_filename, 'rb') as pickle_file:
@@ -107,7 +104,7 @@ def initialize_neurons(input_spk, layer_n_neurons, neurons_vars):
 
     neurons = {}
 
-    n_inputs = 513 #numero neuronas igual al de entradas_audio_spikes.py
+    n_inputs = 513 #numero neuronas empleadas a laentrada para el audio preprocesado.
 
     neurons['input'] = n_mode.audio_spike_neurons(
         n_neurons=n_inputs,
@@ -137,7 +134,7 @@ def initialize_conn(neurons, connect_vars):
     
     conns = {}
 
-    # input to layer 1 connections
+    # Conexion entrada a capa 1 excitatoria
 
     source = neurons['input'] #la capa input de spikes del audio
     target = neurons['layer1e'] #capa 1 de excitatorias
@@ -161,20 +158,20 @@ def initialize_conn(neurons, connect_vars):
         #with open('input-layer1e-weights.pickle', 'wb') as pickle_file:
          #   pickle.dump(weights, pickle_file)
 
-    # conexion excitatory to inhibitory
+    # Conexion excitatoria a inhibitoria
     conns['layer1e-layer1i'] = s_mode.synapses_non_plastic(
         source=neurons['layer1e'],
         target=neurons['layer1i'],
-        connectivity='i == j',
+        connectivity='i == j', #conexion con mismo indice
         synapse_type='excitatory'
     )
     conns['layer1e-layer1i'].w = connect_vars['ex-in-w']
 
-    # conexion inhibitory to excitatory
+    # COnexion inhibitoria a excitatoria
     conns['layer1i-layer1e'] = s_mode.synapses_non_plastic(
         source=neurons['layer1i'],
         target=neurons['layer1e'],
-        connectivity='i != j',
+        connectivity='i != j', #conexion a todas menos la de mismo indice
         synapse_type='inhibitory'
     )
     conns['layer1i-layer1e'].w = connect_vars['in-ex-w']
@@ -241,7 +238,7 @@ def run_simulation(run_params, neurons, connections, monitors):
 
 #########################################################################
 
-def results_evaluation(monitors, connections, analysis_params):
+def results_evaluation(monitors, connections):
     
     #Aalisis de los resultados y gráficas (plots)
 
@@ -250,9 +247,8 @@ def results_evaluation(monitors, connections, analysis_params):
         return
     
     end_time = max(monitors['spikes']['layer1e'].t)
-    print(end_time)
     start_time = min(monitors['spikes']['layer1e'].t)
-    print(start_time)
+
     a_mode.analyse_note_responses(
         spike_indices=monitors['spikes']['layer1e'].i,
         spike_times=monitors['spikes']['layer1e'].t,
@@ -320,14 +316,10 @@ def results_evaluation(monitors, connections, analysis_params):
 
     #a_mode.plot_weight(connections['input-layer1e'])
 
-
 #########################################################################
-
 
 spike_filename = os.path.basename(run_vars['input_spikes_filename'])
 run_id = spike_filename.replace('.pickle', '')
-#if not run_params['from_paramfile']:
-#    param_mod.record_params(params, run_id)
 input_spikes = load_audio_input(run_vars)
 input_end_time = np.ceil(np.amax(input_spikes['times']))
 
@@ -341,55 +333,49 @@ if not run_vars['no_standalone']:
     build_dir += run_id
     b2.set_device('cpp_standalone', directory=build_dir)
 
-
-print("Initialising neurons...")
+print("Inicializando neuronas...")
 neurons = initialize_neurons(
     input_spikes, run_vars['layer_n_neurons'],
     neurons_vars
 )
-print("done!")
+print("Listo!")
 
 
-print("Initialising connections...")
+print("Inicializando conexiones...")
 connections = initialize_conn(
     neurons,
     connect_vars
 )
-print("done!")
+print("Listo!")
 
 
-print("Initialising monitors...")
+print("Inicializando monitores...")
 monitors = init_monitors(neurons, connections, mon_vars)
-print("done!")
+print("Listo!")
 
     
-print("Running simulation...")
+print("Ejecutando simulacion...")
 net = run_simulation(run_vars, neurons, connections, monitors)
+
 guardar = False
 if(guardar== True):
     weights = np.array(connections['input-layer1e'].w)
         #guardo los pesos por si necesito trabajar con ellos
     np.savetxt('evaluation/weights.out', weights) 
-    with open('input-layer1e-weights.pickle', 'wb') as pickle_file:
+    with open('weights.pickle', 'wb') as pickle_file:
         pickle.dump(weights, pickle_file)
-print("done!")
-
+print("Listo!")
 
 def save_figures(name):
-    print("Saving figures...")
+    print("Guardando figuras...")
     figs = plt.get_fignums()
     for fig in figs:
         plt.figure(fig)
         plt.savefig('figures/%s_fig_%d.png' % (name, fig))
-    print("done!")
+    print("Listo!")
 
 results_evaluation(monitors,connections,analysis_vars)
 
 if analysis_vars['save_figs']:
         save_figures(run_id)
-
-
-
-#############################################################################################33
-
 
