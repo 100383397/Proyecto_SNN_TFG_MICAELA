@@ -14,11 +14,13 @@ from mingus.containers import Note
 #Y para realizar la validación presentaremos diferentes audios exponiendo distintos casos.
 music_seq = {}
 music_seq['scale'] = [ 'C-4','C#-4','D-4','D#-4','E-4','F-4','F#-4','G-4','G#-4','A-4','A#-4','B-4']
-#music_seq['3_notes'] = [ 'C-4','E-4','G-4']
+#music_seq['guitar_scale'] = [ 'C-4','D-4','E-4','F-4','G-4']
 #music_seq['4_notes'] = ['C-4','G-4', 'D-4', 'F#-4']
 #music_seq['melody'] = ['Ab-5','G-5', 'F-5', 'G-5', 'Eb-5', 'F-5', 'C-5', 'Bb-4', 'C-5', 'C-6']
+#music_seq['octaves'] = ['C-5', 'D-5', 'E-5', 'F-5', 'G-5']
 
-#Separación entre las notas para la realización de experimentos con distintas separaciones
+#Separación entre las notas para la realización de experimentos con distintas separaciones y tambien
+#es el tiempo que se mantiene la nota sostenida (ver función play_notes_seq)
 s_separation = [0.5, 1, 2] 
 
 #Inicializamos el instrumento mediante archivo .sf2 con el que se va a trabajar, en este caso es "Piano"
@@ -31,8 +33,8 @@ def play_notes_seq(seq, time_seconds):
     for note_i in seq:
         note = Note(note_i)
         fluidsynth.play_Note(note)
-        fluidsynth.midi.sleep(seconds=time_seconds)
-        fluidsynth.stop_Note(note)
+        fluidsynth.midi.sleep(seconds=time_seconds) #tiempo de la nota sostenida
+        fluidsynth.stop_Note(note) #detiene la reproducción de la nota para que no se solape con la siguiente
 
 # Generamos los audios y los guardamos, el número contenido en el for final es el número de repeticiones
 # de la secuencia de notas que hemos definido previamente
