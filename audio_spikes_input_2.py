@@ -67,7 +67,7 @@ mel_spectral_pw_norm = (mel_spectral_pw - pw_min)/pw_range
 len = 4
 kernel = np.ones((1, len))
 mel_spectral_input = ndimage.convolve(mel_spectral_pw_norm, kernel)
-mel_spectral_input[mel_spectral_input < 0.64*len] = 0
+mel_spectral_input[mel_spectral_input < 0.59*len] = 0
 
 plt.figure()
 plt.imshow(mel_spectral_input, aspect='auto', origin='lower')
