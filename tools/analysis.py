@@ -89,7 +89,7 @@ def plot_state_var(monitor, state_vals, firing_neurons, title):
 def analyse_note_responses(spike_indices, spike_times,from_time, to_time):
     
     note_length = 0.5  #Distancia entre las notas en segundos
-    n_notes = 4 #numero de notas analizadas
+    n_notes = 12 #numero de notas analizadas
 
     # Para cada neurona, se consideran sus instantes de tiempo relevantes cuando se recorren 
     # los tiempos de los disparos registrados y ese indice de ese instante de tiempo coincide

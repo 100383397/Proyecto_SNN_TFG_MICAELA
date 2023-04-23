@@ -5,7 +5,11 @@ import brian2 as b2
 # la membrana postsinaptica modulan el efecto de STDP.
 
 # La implementacion de STDP se lleva a cabo siguiendo el segundo tutorial de Brian, haciendo el cálculo
-# de STDP empleando el sistema de rastreo sinaptico.
+# de STDP empleando el sistema de rastreo sinaptico. SU implementación en la forma mas basica implica
+# una actualización de los valores de los pesos sinapticos en el momento de un pico postsinaptico empleando
+# una funcion exponencial por partes. De esta forma el cambio de peso no depende del valor actual del peso
+# ESto se conoce como STDP aditivo 
+
 
 def synapses_stdpEX(source, target, connectivity, params):
     syn_params = {
@@ -20,11 +24,16 @@ def synapses_stdpEX(source, target, connectivity, params):
         'max_theta': params['max_theta']
     }
 
+    # Para cada sinapsis se especifican las variables de estado que representan el peso y los rastros
+    # sinapticos (las derivadas del modelo de ecuaciones que viene a continuacion)
+
     eqs_stdp_ee = '''
     w                             : 1
     dpre/dt = -pre / tc_pre_ee    : 1 (event-driven)
     dpost/dt = -post / tc_post_ee : 1 (event-driven)
     '''
+
+    #Definimos la accion a realizar cuando la sinapsis recibe un pico presinaptico y postsinaptico
 
     eqs_stdp_pre_ee = '''
     ge_post += w * siemens
