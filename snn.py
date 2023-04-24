@@ -9,6 +9,43 @@ import tools.synapses as s_mode
 import tools.neurons as n_mode
 import tools.analysis as a_mode
 
+#Siguiendo el modelo de DIehl para el reconocimiento de digitos, se implementa un mecanismo competitivo
+# en la que "el ganador se lo lleva todo", es decir la primera neurona en disparar a una nota será la que
+# dispare siempre a esa nota, así con la competencia se evita que otras neuronas aprendan la misma nota.
+# ESte mecanismo se implementa a traves de conexiones inhibidoras de manera que solo una neurona excitatoria
+# se dispare a la vez. Primero se establecen los pesos de forma aleatoria, y según el experimento de los dígitos
+# al presentar un dígito, los pesos de una neurona serán  una cociencia mejor para el digito y esa neurona se 
+# disparara primero, y al dispararse por medio de la configuracion inhibitoria, evitará que el resto de neuronas
+# dispare. Para un segundo dígito, la primera neurona perderá peso y la segunda lo ganará, disparando esta al 
+# segundo numero.
+# EL nivel de inhibición para cumplir esta configuración era dificil de equilibrar, si el nivel es debil, cada
+# neurona no podia evitar que el resto se disparasen, y si el nivel es alto, la primera neurona dominaria y evitaria
+# qu el resto se disparasen . Para evitar este problema se emplea un mecanismo adicional de adaptacion de la tasa 
+# de disparo, cuyo efecto  aumenta gradualmente el voltaje de umbral de la neurona cuanto más se ha disparado la 
+# neurona, de forma ue cuando se aplica un dígito diferente es menos probable que la primera neurona dispare y la
+# segunda tiene mas posibilidades. Otro detalle del modelo original es la implementación de un cierto retraso, que dio
+# algo de mayor robustez (el codigo se basa en el codigo fuente de este modelo de Diehl)
+
+#COMO RESUMEN DEL MODELO EMPLEADO:
+
+# Modelo adaptado de Diehl: dos capas principales, entrada de neuronas excitatorias cuyo pico esta determinado por 
+# el estimulo de entrad a aplicado y una salida de neuronas excitatorias.
+# Cada neurona de salida esta conectada a todas las neuronas de la capa de entrada por medio de conexiones STDP con pesos
+# iniciales aleatorios. EL numero de neuronas de salida es mucho menor que el de las de entrada.
+# Se emplea otra capa de neuronas inhibitorias con una neurona inhibidora por cada neurona de salida excitatoria.
+# Cada neurona de salida se conecta a su inhibidora correspondiente y cada inhibidora se conecta a todas las demas
+# neuronas excitatorias de la capa de salida.Con este efecto se consigue que cuando se dispare una neurona de salida, 
+# se dispara la inhibidora correspondiente  y a su vez evita que se disparen el resto de excitatorias de salida (es el 
+# mecanismo competitivo explicado al principio)
+# Las conexiones de la capa de entrada y de salida  se implementan con un retardo aleatorio entre 1 y 10 ms y las demas
+# conexiones sin demora.
+# La dinamica neuronal se implementa con el modelo de neurona LIF (con periodo refractario 5ms) con un mecanismo de 
+# adaptacion del umbral de disparo, que aumenta el umbral de disparo en cada pico postsinaptico 
+# Se emplea STDP aditivo de manera que el cambio de peso no depende del peso actual, empleando un enfoque del vecino
+# mas cercano donde solo se tiene en cuenta el tiempo transcurrido desde el pico mas reciente al calcular los cambios 
+# de peso. LOs pesos se limitan aplicando un maximo estricto, y se emplea un termino adicional que reduce el aumento de
+# peso si el tiempo transcurrido desde el ultimo pico postsinaptico es largo.
+
 ####################################################################################
 
 # Primero se definen los parametros usados para: neuronas, conexiones, monitores y
@@ -22,7 +59,7 @@ neurons_vars['v_reset_e'] = -69 * b2.mV #potencial de reset E original -65
 neurons_vars['v_reset_i'] = -49 * b2.mV #potencial de reset I original -45
 neurons_vars['v_thresh_e'] = -52 * b2.mV #umbral E
 neurons_vars['v_thresh_i'] = -40 * b2.mV #umbral I
-neurons_vars['refrac_e'] = 6 * b2.ms #periodo refractario E
+neurons_vars['refrac_e'] = 5 * b2.ms #periodo refractario E
 neurons_vars['refrac_i'] = 3 * b2.ms #periodo refractario I
 neurons_vars['tc_v_ex'] = 95 * b2.ms #cte tiempo potencial membrana E, original eran 100 ms
 neurons_vars['tc_v_in'] = 5 * b2.ms #cte tiempo poencial membrana I, origial era 10 ms
@@ -59,7 +96,7 @@ connect_vars['in-ex-w'] = 17.0 #PESO
 run_vars = {}
 
 run_vars['layer_n_neurons'] = 12 #numero de neuronas de salida
-run_vars['input_spikes_filename'] = 'spikes_inputs/melscale_4_notes_0.5_s.pickle'
+run_vars['input_spikes_filename'] = 'spikes_inputs/melscale_scale_0.5_s.pickle'
 run_vars['no_standalone'] = True
 
 mon_vars = {}
@@ -104,7 +141,7 @@ def initialize_neurons(input_spk, layer_n_neurons, neurons_vars):
 
     neurons = {}
 
-    n_inputs = 513 #numero neuronas empleadas a laentrada para el audio preprocesado.
+    n_inputs = 512 #numero neuronas empleadas a laentrada para el audio preprocesado.
 
     neurons['input'] = n_mode.audio_spike_neurons(
         n_neurons=n_inputs,
@@ -146,8 +183,8 @@ def initialize_conn(neurons, connect_vars):
     )
 
     #asignamos peso inicial aleatorio para la conexion entrada - excitatoria 1
-    if os.path.exists('input-layer1e-weights.pickle'):
-        with open('input-layer1e-weights.pickle', 'rb') as pickle_file:
+    if os.path.exists('weights.pickle'):
+        with open('weights.pickle', 'rb') as pickle_file:
             pickle_obj = pickle.load(pickle_file)
         conns['input-layer1e'].w = pickle_obj
     else:
@@ -162,7 +199,7 @@ def initialize_conn(neurons, connect_vars):
     conns['layer1e-layer1i'] = s_mode.synapses_non_plastic(
         source=neurons['layer1e'],
         target=neurons['layer1i'],
-        connectivity='i == j', #conexion con mismo indice
+        connectivity='i == j', #conexion con inhibidora de mismo indice
         synapse_type='excitatory'
     )
     conns['layer1e-layer1i'].w = connect_vars['ex-in-w']
@@ -171,7 +208,7 @@ def initialize_conn(neurons, connect_vars):
     conns['layer1i-layer1e'] = s_mode.synapses_non_plastic(
         source=neurons['layer1i'],
         target=neurons['layer1e'],
-        connectivity='i != j', #conexion a todas menos la de mismo indice
+        connectivity='i != j', #conexion a todas las excitatorias menos la de mismo indice
         synapse_type='inhibitory'
     )
     conns['layer1i-layer1e'].w = connect_vars['in-ex-w']
@@ -374,7 +411,7 @@ def save_figures(name):
         plt.savefig('figures/%s_fig_%d.png' % (name, fig))
     print("Listo!")
 
-results_evaluation(monitors,connections,analysis_vars)
+results_evaluation(monitors,connections)
 
 if analysis_vars['save_figs']:
         save_figures(run_id)
