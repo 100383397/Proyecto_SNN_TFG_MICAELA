@@ -293,7 +293,7 @@ def results_evaluation(monitors, connections):
         to_time=end_time
     )
         
-    plt.ion()
+''' plt.ion()
 
     plt.figure()
 
@@ -347,7 +347,7 @@ def results_evaluation(monitors, connections):
     a_mode.w_diff(
         connections['input-layer1e'],
         monitors['connections']['input-layer1e']
-    )
+    )'''
 
     #Para visualizar los pesos, para cada nuerona tomamos los pesos mas relevantes
 
@@ -394,7 +394,7 @@ print("Listo!")
 print("Ejecutando simulacion...")
 net = run_simulation(run_vars, neurons, connections, monitors)
 
-guardar = False
+guardar = True
 if(guardar== True):
     weights = np.array(connections['input-layer1e'].w)
         #guardo los pesos por si necesito trabajar con ellos
