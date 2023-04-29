@@ -89,7 +89,7 @@ def plot_state_var(monitor, state_vals, firing_neurons, title):
 def analyse_note_responses(spike_indices, spike_times,from_time, to_time):
     
     note_length = 0.5  #Distancia entre las notas en segundos
-    n_notes = 12 #numero de notas analizadas
+    n_notes = 3 #numero de notas analizadas
 
     # Para cada neurona, se consideran sus instantes de tiempo relevantes cuando se recorren 
     # los tiempos de los disparos registrados y ese indice de ese instante de tiempo coincide
@@ -106,7 +106,6 @@ def analyse_note_responses(spike_indices, spike_times,from_time, to_time):
         relevant_spike_times = spike_times[spike_indices == neuron_n]
         relevant_spike_times = [t for t in relevant_spike_times if t > from_time and t < to_time]
         relevant_spike_times = np.array(relevant_spike_times)
-        
         # Convertimos el array que almacena los tiempos relevantes de disparo de cada neurona entre
         # el tiempo que dura cada nota, a solo los enteros (tipo int) de la primera repeticion de las 
         # notas, y calculamos el array de restos (modulo) del array de tiempos tipo int entre el numero 
@@ -117,25 +116,28 @@ def analyse_note_responses(spike_indices, spike_times,from_time, to_time):
         # Con este if excluimos del análisis aquellas neuronas que no deberían dispararse y generan picos
         # muy esporádicos
 
-        note_responses=0
-        if(len(note_firings_int) > 20):
-            note_responses = np.mod(note_firings_int, n_notes) 
+        note_responses = np.mod(note_firings_int, n_notes) 
         #print(note_bin_firings)
         #print(note_responses)
 
         # Cuento el numero de ocurrencias de cada resto de tiempo y el máximo va a ser la nota más comun
         # a la que esa neurona dispara en su presencia.
-            final_note = np.argmax(np.bincount(note_responses))
-
+        final_note = np.argmax(np.bincount(note_responses))
+        
+        if(len(note_responses) > 30):
         #De forma que el numero de disparos correctos es la suma de los restos que son iguales a la nota comun
             n_correct_firings = sum(note_responses == final_note)
-        
+            n_firings = len(note_responses)
         # Se calcula el porcentaje como el numero de disparos correctos / disparos totales * 100
             success_firing_pct = float(n_correct_firings) / len(note_responses) * 100
         
-            print("Neuron %d likes note %d, %.1f%% success" \
-                % (neuron_n, final_note, success_firing_pct))
-       
+            print("Neuron %d likes note %d, %.1f%% success ( %i total spikes)" \
+                % (neuron_n, final_note, success_firing_pct, n_firings))
+        else:
+            incorrect_firings = len(note_responses)
+            print("Neuron %d likes note %d, mistake (%i spikes)" \
+                % (neuron_n, final_note, incorrect_firings))
+
     return 
 
 #####################################################################################
