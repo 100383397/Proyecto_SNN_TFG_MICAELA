@@ -53,16 +53,16 @@ import tools.analysis as a_mode
 
 neurons_vars = {}
 
-neurons_vars['v_rest_e'] = -69 * b2.mV #potencial de reposo excitatoria original -65
-neurons_vars['v_rest_i'] = -64 * b2.mV #potencial de reposo inhibitoria original -60
-neurons_vars['v_reset_e'] = -69 * b2.mV #potencial de reset E original -65
+neurons_vars['v_rest_e'] = -66 * b2.mV #potencial de reposo excitatoria original -65
+neurons_vars['v_rest_i'] = -61 * b2.mV #potencial de reposo inhibitoria original -60
+neurons_vars['v_reset_e'] = -65 * b2.mV #potencial de reset E original -65
 neurons_vars['v_reset_i'] = -49 * b2.mV #potencial de reset I original -45
 neurons_vars['v_thresh_e'] = -52 * b2.mV #umbral E
 neurons_vars['v_thresh_i'] = -40 * b2.mV #umbral I
 neurons_vars['refrac_e'] = 5 * b2.ms #periodo refractario E
-neurons_vars['refrac_i'] = 3 * b2.ms #periodo refractario I
-neurons_vars['tc_v_ex'] = 95 * b2.ms #cte tiempo potencial membrana E, original eran 100 ms
-neurons_vars['tc_v_in'] = 5 * b2.ms #cte tiempo poencial membrana I, origial era 10 ms
+neurons_vars['refrac_i'] = 2 * b2.ms #periodo refractario I
+neurons_vars['tc_v_ex'] = 100 * b2.ms #cte tiempo potencial membrana E, original eran 100 ms
+neurons_vars['tc_v_in'] = 10 * b2.ms #cte tiempo poencial membrana I, origial era 10 ms
 neurons_vars['tc_ge'] = 1 * b2.ms #cte tiempo de la conductancia E
 neurons_vars['tc_gi'] = 2 * b2.ms #cte tiempo de la conductancia I
 neurons_vars['e_ex_ex'] = 0 * b2.mV #Potencial de inversion sinaptica excitatorio neuronas excitatorias
@@ -96,7 +96,7 @@ connect_vars['in-ex-w'] = 17.0 #PESO
 run_vars = {}
 
 run_vars['layer_n_neurons'] = 12 #numero de neuronas de salida
-run_vars['input_spikes_filename'] = 'spikes_inputs/melscale_scale_0.5_s.pickle'
+run_vars['input_spikes_filename'] = 'spikes_inputs/melscale_scaleClarinete_0.5_s.pickle'
 run_vars['no_standalone'] = True
 
 mon_vars = {}
@@ -292,8 +292,21 @@ def results_evaluation(monitors, connections):
         from_time=start_time,
         to_time=end_time
     )
-        
-''' plt.ion()
+    #print(monitors['spikes']['layer1e'].t/b2.second)    
+    #print(monitors['spikes']['layer1e'].i)
+    #Para calcular la media y la varianza del entrenamiento y caracterizar asi el sistema implementado
+    #se va a realizar, para la media, un sumatorio de los indices / numero de indices totales
+    #La media es razonable entorno a 6, ya que hay 12 notas, lo suyo seria que estuviera en el medio.
+    #TODAS LAS NOTAS SON IGUAL DE EQUIPROBABLES.
+    # Se espera que para distintas duraciones de las notas, a mayor tiempo entre notas si la dispersion es
+    # mas alta, es menos fiable, y si es mas baja lo contrario.
+
+    mean_i = np.mean(monitors['spikes']['layer1e'].i)
+    var_i = np.var(monitors['spikes']['layer1e'].i)
+    print(mean_i)
+    print(var_i)
+
+    plt.ion()
 
     plt.figure()
 
@@ -347,7 +360,7 @@ def results_evaluation(monitors, connections):
     a_mode.w_diff(
         connections['input-layer1e'],
         monitors['connections']['input-layer1e']
-    )'''
+    )
 
     #Para visualizar los pesos, para cada nuerona tomamos los pesos mas relevantes
 
@@ -394,7 +407,7 @@ print("Listo!")
 print("Ejecutando simulacion...")
 net = run_simulation(run_vars, neurons, connections, monitors)
 
-guardar = True
+guardar = False
 if(guardar== True):
     weights = np.array(connections['input-layer1e'].w)
         #guardo los pesos por si necesito trabajar con ellos
