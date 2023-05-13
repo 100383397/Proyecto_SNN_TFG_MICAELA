@@ -1,5 +1,6 @@
 #imports
 from __future__ import print_function, division
+import sys
 import os.path
 import pickle
 import brian2 as b2
@@ -96,7 +97,8 @@ connect_vars['in-ex-w'] = 17.0 #PESO
 run_vars = {}
 
 run_vars['layer_n_neurons'] = 12 #numero de neuronas de salida
-run_vars['input_spikes_filename'] = 'spikes_inputs/melscale_scaleClarinete_0.5_s.pickle'
+run_vars['input_spikes_filename'] = sys.argv[1]#'spikes_inputs_train/scale_0.5_s.pickle'
+run_vars['output_spikes_filename'] = sys.argv[2]
 run_vars['no_standalone'] = True
 
 mon_vars = {}
@@ -106,6 +108,8 @@ mon_vars['monitors_dt'] = 1000/60.0 * b2.ms
 analysis_vars = {}
 
 analysis_vars['save_figs'] = True
+analysis_vars['note_length'] = float(sys.argv[3])#0.5
+analysis_vars['n_notes'] = 12
 
 variables = (neurons_vars, connect_vars, mon_vars, run_vars, analysis_vars)
 
@@ -183,7 +187,7 @@ def initialize_conn(neurons, connect_vars):
     )
 
     #asignamos peso inicial aleatorio para la conexion entrada - excitatoria 1
-    if os.path.exists('weights.pickle'):
+    if False:#os.path.exists('weights.pickle'):
         with open('weights.pickle', 'rb') as pickle_file:
             pickle_obj = pickle.load(pickle_file)
         conns['input-layer1e'].w = pickle_obj
@@ -290,7 +294,9 @@ def results_evaluation(monitors, connections):
         spike_indices=monitors['spikes']['layer1e'].i,
         spike_times=monitors['spikes']['layer1e'].t,
         from_time=start_time,
-        to_time=end_time
+        to_time=end_time,
+        note_length = analysis_vars['note_length'], #Distancia entre las notas en segundos
+        n_notes = analysis_vars['n_notes']
     )
     #print(monitors['spikes']['layer1e'].t/b2.second)    
     #print(monitors['spikes']['layer1e'].i)
@@ -303,10 +309,11 @@ def results_evaluation(monitors, connections):
 
     mean_i = np.mean(monitors['spikes']['layer1e'].i)
     var_i = np.var(monitors['spikes']['layer1e'].i)
-    print(mean_i)
-    print(var_i)
-
-    plt.ion()
+    std_i = np.std(monitors['spikes']['layer1e'].i)
+    print("La media calculada en función de los indices es: %f"%( mean_i))
+    print("La varianza resultante es: %f" %( var_i))
+    print("La desviacion tipica resultante es: %f" %( std_i))
+    '''plt.ion()
 
     plt.figure()
 
@@ -360,7 +367,7 @@ def results_evaluation(monitors, connections):
     a_mode.w_diff(
         connections['input-layer1e'],
         monitors['connections']['input-layer1e']
-    )
+    )'''
 
     #Para visualizar los pesos, para cada nuerona tomamos los pesos mas relevantes
 
@@ -407,12 +414,13 @@ print("Listo!")
 print("Ejecutando simulacion...")
 net = run_simulation(run_vars, neurons, connections, monitors)
 
-guardar = False
+guardar = True
 if(guardar== True):
     weights = np.array(connections['input-layer1e'].w)
         #guardo los pesos por si necesito trabajar con ellos
-    np.savetxt('evaluation/weights.out', weights) 
-    with open('weights.pickle', 'wb') as pickle_file:
+    np.savetxt('evaluation/weights.out', weights)
+    filename = run_vars['output_spikes_filename']
+    with open(filename, 'wb') as pickle_file:
         pickle.dump(weights, pickle_file)
 print("Listo!")
 
