@@ -13,6 +13,6 @@ do
     for((j=1; j<=$max_iter; j++))
         do
         echo "Iter n. ${j}"
-        python3.9 "$python_file" "$folder_input_spikes/scale${i}rep_0.5_s.pickle" "$folder_output_weights/scale${i}rep_${j}iter_0.5_s.pickle" 0.5 >> "out_${i}rep.txt"
+        python3.9 "$python_file" "$folder_input_spikes/scale${i}rep_2.0_s.pickle" "$folder_output_weights/scale${i}rep_${j}iter_2.0_s.pickle" 2.0 >> "out_${i}rep.txt"
         done
 done
