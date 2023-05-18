@@ -109,7 +109,7 @@ analysis_vars = {}
 
 analysis_vars['save_figs'] = True
 analysis_vars['note_length'] = float(sys.argv[3])#0.5
-analysis_vars['n_notes'] = 12
+analysis_vars['n_notes'] = 19 #16 #15
 
 variables = (neurons_vars, connect_vars, mon_vars, run_vars, analysis_vars)
 
@@ -187,7 +187,7 @@ def initialize_conn(neurons, connect_vars):
     )
 
     #asignamos peso inicial aleatorio para la conexion entrada - excitatoria 1
-    if False:#os.path.exists('weights.pickle'):
+    if os.path.exists('weights.pickle'):
         with open('weights.pickle', 'rb') as pickle_file:
             pickle_obj = pickle.load(pickle_file)
         conns['input-layer1e'].w = pickle_obj
@@ -313,7 +313,8 @@ def results_evaluation(monitors, connections):
     print("La media calculada en función de los indices es: %f"%( mean_i))
     print("La varianza resultante es: %f" %( var_i))
     print("La desviacion tipica resultante es: %f" %( std_i))
-    '''plt.ion()
+    
+    plt.ion()
 
     plt.figure()
 
@@ -367,7 +368,7 @@ def results_evaluation(monitors, connections):
     a_mode.w_diff(
         connections['input-layer1e'],
         monitors['connections']['input-layer1e']
-    )'''
+    )
 
     #Para visualizar los pesos, para cada nuerona tomamos los pesos mas relevantes
 
@@ -414,7 +415,7 @@ print("Listo!")
 print("Ejecutando simulacion...")
 net = run_simulation(run_vars, neurons, connections, monitors)
 
-guardar = True
+guardar = False
 if(guardar== True):
     weights = np.array(connections['input-layer1e'].w)
         #guardo los pesos por si necesito trabajar con ellos
