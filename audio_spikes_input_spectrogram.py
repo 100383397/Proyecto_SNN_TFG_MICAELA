@@ -68,7 +68,7 @@ plt.imshow(spectr_in, aspect='auto', origin='lower')
 plt.savefig('images/%s_spectral_input.png' % name)
 
 # Ahora se traducen los audios de entrada en una serie de picos mediante Brian2 y se obtiene un 
-# tren de picos de 513 neuronas de entrada que reflejan el contenido espectral de cada nota
+# tren de picos de 513 neuronas de entrada que reflejan el contenido espectral de cada nota.
 
 audio_input = b2.TimedArray(spectr_in.T, dt=dt)
 
