@@ -49,7 +49,7 @@ plt.title('Espectrograma a escala de Mel')
 plt.tight_layout()
 plt.savefig('images/%s_melspectrogram.png' % name)
 
-#Calculamos el espectrograma en escala de mel normalizado (entre 0 y 1.)
+#Calculamos el espectrograma en escala de mel normalizado (entre 0 y 1)
 
 pw_min = np.amin(S_dB)
 pw_max = np.amax(S_dB)
