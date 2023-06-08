@@ -7,7 +7,7 @@ folder_input_spikes="spikes_inputs_train" #Carpeta de donde debe coger los .pick
 folder_output_weights="weights_train" #Carpeta donde se guarda el ajuste de pesos finales de cada simulación
 
 # La escala se repite de 1 a 10 veces. Cada audio aumenta en 1 la repetición de la escala que contienen
-# Se van a generar 30 iteraciones, 30 entrenamiento para cada número de repeticiones de la escala
+# Se van a generar 30 iteraciones, 30 entrenamiento para cada número de repeticiones de la escala.
 
 num_rep=10
 max_iter=30
