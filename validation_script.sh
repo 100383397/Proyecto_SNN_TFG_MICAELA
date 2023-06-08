@@ -6,4 +6,4 @@ folder_input_spikes="spikes_inputs_validation"
 folder_output_weights="weights_train"
 
 
-python3.9 "$python_file" "$folder_input_spikes/melody5Guitar_2.0_s.pickle" "$folder_output_weights/scale${i}rep_${j}iter_0.5_s.pickle" 2.0 >> "out_info.txt"
+python3.9 "$python_file" "$folder_input_spikes/chords5_2.0_s.pickle" "$folder_output_weights/scale${i}rep_${j}iter_1.0_s.pickle" 2.0 >> "out_info.txt"
