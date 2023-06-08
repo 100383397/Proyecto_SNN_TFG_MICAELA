@@ -56,7 +56,7 @@ pw_range = pw_max - pw_min
 spectral_pw_norm = (spectro_pw - pw_min)/pw_range
 
 # Se enfatizan los componentes que se extienden horizontalmente en el tiempo (kernel)
-# Se hace la convolución para eliminar los transitorios breves al comienzo.
+# Se hace la convolución para eliminar los transitorios breves al comienzo de cada nota.
 
 len = 4
 kernel = np.ones((1, len))
@@ -82,7 +82,7 @@ I = audio_input(t, i): 1
 
 neuronG = b2.NeuronGroup(N=num_freqs, model=eqs_model, reset='v=0', threshold='v>1', dt = dt/10)
 
-#Registramos los picos generados con el SpikeMOnitor de Brian2
+#Registramos los picos generados con el SpikeMonitor de Brian2
 
 spikeR = b2.SpikeMonitor(neuronG)
 
