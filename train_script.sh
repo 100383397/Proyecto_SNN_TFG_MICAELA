@@ -12,6 +12,10 @@ folder_output_weights="weights_train" #Carpeta donde se guarda el ajuste de peso
 num_rep=10
 max_iter=30
 
+# Hay que cambiar el tiempo definido del archivo de los input spikes que se desee probar
+# Hay que modificar el parámetro final que indica la duración de notas del audio introducido, ya sea
+# 0.5, 1.0 o 2.0
+
 for((i=1; i<=$num_rep; i++))
 do
     echo "/****************************/"
