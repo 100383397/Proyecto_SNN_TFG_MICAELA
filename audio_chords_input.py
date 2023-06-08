@@ -59,8 +59,8 @@ chord['chord1'] = NoteContainer(['A-3','C-4','E-4'])
 chord['chord2'] = NoteContainer(['C-4','E-4','G-4'])
 chord['chord3'] = NoteContainer(['B-3','D-4','F-4'])
 chord['chord4'] = NoteContainer(['C-4','F-4','A-4'])
-chord['chord6'] = NoteContainer(['B-3','D-4','G#-4'])
-chord['chord7'] = NoteContainer(['C-4','E-4','A-4'])
+chord['chord5'] = NoteContainer(['B-3','D-4','G#-4'])
+chord['chord6'] = NoteContainer(['C-4','E-4','A-4'])
 
 # Separación entre los acordes para la realización de este experimento con distintos tiempos. 
 # Estos tiempos son, también, el tiempo que se mantienes las notas del acorde sostenidas.
