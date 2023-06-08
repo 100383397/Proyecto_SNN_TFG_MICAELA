@@ -4,173 +4,132 @@ import matplotlib.pyplot as plt
 import brian2 as b2
 
 # Este script recoge las funciones empleadas para mostrar los resultádos tanto gráficos como
-# cuantitativos
+# cuantitativos obtenidos a la salida de la simulación. Todos los resultados están guardados en las
+# carpetas ""_results, images y figures.
 
-##########################################################################################
 
-#Grafica que muestra el ajuste de los pesos entre instantes para cada neurona (diferencias de pesos)
+# Funcion para analizar la respuesta de los spikes de las neuronas de salida frente a las notas de entrada
 
-def w_diff(connections, weight_monitor, from_t=0, to_t=-1, newfig=True):
-    if newfig:
-        plt.figure()
-    else:
-        plt.clf()
-    neurons = set(connections.j)
-    n_neurons = len(neurons)
-
-    plt.subplot(n_neurons, 1, 1)
-    plt.title('Ajustes de peso para cada neurona')
-
-    # Donde el tiempo del monitor de los pesos es mayor de 0s
-    from_i = np.where(weight_monitor.t >= from_t * b2.second)[0][0]
-
-    if to_t == -1:
-        to_i = -1
-    else:
-    # Donde el tiempo del monitor de los pesos es menor de -1s
-        to_i = np.where(weight_monitor.t <= to_t * b2.second)[0][-1]
-
-    weight_diffs = weight_monitor.w[:, to_i] - weight_monitor.w[:, from_i]
-    max_diff = np.max(weight_diffs)
-    min_diff = np.min(weight_diffs)
-
-    #Guardo las diferencias de  pesos por si necesito trabajar con ellos
-    np.savetxt('evaluation/weight_diffs.out', weight_diffs)
-
-    for neuron_n in neurons:
-        plt.subplot(n_neurons, 1, neuron_n+1)
-        relevant_weights = connections.j == neuron_n
-        diff = weight_diffs[relevant_weights]
-        plt.plot(diff, color='green')
-        plt.ylim([min_diff, max_diff])
-        plt.yticks([])
-        plt.xticks([])
-        plt.ylabel("%d" % neuron_n)
-    plt.savefig('evaluation/weights_diff.png')
-
-########################################################################################
-
-# Definicion de las gráficas para mostrar el comportamiento de distintos parámetros:
-# potencial de membrana, corriente, threshold...
-
-def plot_state_var(monitor, state_vals, firing_neurons, title):
-    plt.figure()
-    n_firing_neurons = len(firing_neurons)
-    min_val = float('inf')
-    max_val = -float('inf')
-
-    for i, neuron_n in enumerate(firing_neurons):
-        plt.subplot(n_firing_neurons, 1, i+1)
-        neuron_val = state_vals[neuron_n, :]
-        neuron_val_min = np.amin(neuron_val)
-        if neuron_val_min < min_val:
-            min_val = neuron_val_min
-        neuron_val_max = np.amax(neuron_val)
-        if neuron_val_max > max_val:
-            max_val = neuron_val_max
-        plt.plot(monitor.t, neuron_val)
-        plt.ylabel("N. %d" % neuron_n)
-
-    for i, _ in enumerate(firing_neurons):
-        plt.subplot(n_firing_neurons, 1, i+1)
-        plt.ylim([min_val, max_val])
-        plt.yticks([min_val, max_val])
-
-    for i in range(len(firing_neurons)-1):
-        plt.subplot(n_firing_neurons, 1, i+1)
-        plt.xticks([])
-    plt.subplot(n_firing_neurons, 1, 1)
-    plt.title(title)
-
-#####################################################################################
-
-# Funcion para analizar la respuesta de los spikes de las neuronas frente a las notas de entrada
-
-def analyse_note_responses(spike_indices, spike_times,from_time, to_time, note_length, n_notes):
+def note_data_responses(spike_i, spike_t, from_t, to_t, note_t, n_notes):
     
-    note_length = note_length #Distancia entre las notas en segundos
-    n_notes = n_notes #numero de notas que contiene el audio, es como darles un indice
+    note_t = note_t # Distancia entre las notas en segundos
+    n_notes = n_notes # Numero de notas que contiene el audio. 
+                      # Cambia para cada secuencia (ver variable en script snn.py)
 
-    # A la hora de mostrar los resultados la nota aparecerá con el indice de su primera ocurrencia,
-    # es decir, para el FUR ELISE: el sol sera la note 0, el fa# la 1, pero la siguiente distinta es
-    # en el indice 5, que sera la nota RE
+    # A la hora de mostrar los resultados cada nota aparecerá con el indice de su primera ocurrencia,
+    # Por ejemplo, para el FUR ELISE: el sol sera la note 0, el fa# la 1, pero la siguiente distinta es
+    # en el indice 5, que sera la nota re.
 
     # Para cada neurona, se consideran sus instantes de tiempo relevantes cuando se recorren 
     # los tiempos de los disparos registrados y ese indice de ese instante de tiempo coincide
-    # con el indice de neurona evaluada ( se recorre con el for).
+    # con el indice de neurona evaluada.
 
-    # - Ej: se toma el tiempo en segundos de spike_times(spike indice 0 = neurona numero 0),
-    #   y esos tiempos donde coincidan los indices serán los tiempos de disparo de la neurona 0
+    for neuron_n in set(spike_i):
 
-    # Y tambien son tiempos relevantes si estos tiempos de los indices coincidentes están entre
-    #  el tiempo minimo y maximo de los disparos. (el primero que se produce y el último)
+        important_spike_t = spike_t[spike_i == neuron_n]
+        important_spike_t = [t for t in important_spike_t if t > from_t and t < to_t]
+        important_spike_t = np.array(important_spike_t)
 
-    for neuron_n in set(spike_indices):
+        # Se convierte el array que almacena los tiempos de cada neurona entre el tiempo que dura cada nota 
+        # a solo los enteros (int). Se calcula el array de restos (modulo) de los tiempos entre el numero 
+        # total de notas contenidas en el audio.
 
-        relevant_spike_times = spike_times[spike_indices == neuron_n]
-        relevant_spike_times = [t for t in relevant_spike_times if t > from_time and t < to_time]
-        relevant_spike_times = np.array(relevant_spike_times)
+        note_fir_int = np.floor(important_spike_t / note_t).astype(int)
+        note_resp = np.mod(note_fir_int, n_notes) 
 
-        #Calcular la dispersion por neurona (desviacion estandar de los spikes frente al tiempo), con una dispersión proxima, es mas consiste, lo suyo es
-        #que este constante de una neurona a otra
-        #var_t_for_neuron = np.std(relevant_spike_times)
-        #print("La desviación estandar de esta neurona es: %f" % (var_t_for_neuron))
-        # Convertimos el array que almacena los tiempos relevantes de disparo de cada neurona entre
-        # el tiempo que dura cada nota, a solo los enteros (tipo int) de la primera repeticion de las 
-        # notas, y calculamos el array de restos (modulo) del array de tiempos tipo int entre el numero 
-        # total de notas distintas.
-
-        note_firings_int = np.floor(relevant_spike_times / note_length).astype(int)
-        note_responses = np.mod(note_firings_int, n_notes) 
-        #print(note_bin_firings)
-        #print(note_responses)
-
-        # Cuento el numero de ocurrencias de cada resto de tiempo y el máximo va a ser la nota más comun
-        # a la que esa neurona dispara en su presencia.
-        final_note = np.argmax(np.bincount(note_responses))
+        # Se calcula la nota más comun
+        final_note = np.argmax(np.bincount(note_resp))
+    
+        # Incluyendo las notas y neuronas erróneas en el análisis, se calcula el número de disparos correctos
+        # e incorrectos, se normalizan dividiéndolos entre el total de disparos y se calcula la tasa de éxito 
+        # por neurona.
         
+        if (len(note_resp) > 1): 
+      
+            n_correct_firings = sum(note_resp == final_note)
+            n_incorrect_firings = sum(note_resp != final_note)
+            n_firings = len(note_resp)
 
-        # Con este if excluimos del análisis aquellas neuronas que no deberían dispararse y generan picos
-        # muy esporádicos
-
-        if True:#(len(note_responses) > 0): #se establece entre 10 y 50 en funcion de la duracion de las notas por el numero de picos producidos
-        #De forma que el numero de disparos correctos es la suma de los restos que son iguales a la nota comun
-            n_correct_firings = sum(note_responses == final_note)
-            n_incorrect_firings = sum(note_responses != final_note)
-            n_firings = len(note_responses)
-        # Se calcula el porcentaje como el numero de disparos correctos / disparos totales * 100
-            success_firing_pct = float(n_correct_firings) / len(note_responses) * 100
+            success_pct = float(n_correct_firings) / len(note_resp) * 100
+            #failed_pct = float(n_incorrect_firings) / len(note_resp) * 100
 
             print("Neuron %d likes note %d, %.1f%% success \t incorrect correct total\t %i , %i , %i  " \
-                % (neuron_n, final_note, success_firing_pct, n_incorrect_firings, n_correct_firings, n_firings))
+                % (neuron_n, final_note, success_pct, n_incorrect_firings, n_correct_firings, n_firings))
         else:
-            incorrect_firings = len(note_responses)
+            incorrect_firings = len(note_resp)
             print("Neuron %d likes note %d, mistake (%i spikes)" \
                 % (neuron_n, final_note, incorrect_firings))
 
     return 
 
-#####################################################################################
+# Gráfica que muestra el ajuste de los pesos entre instantes para cada neurona (diferencias de pesos)
 
-#Funcion para mostrar los pesos de cada neurona sin hacer la diferencia 
-'''
-def plot_weight(connections, weight_monitor, from_t=0, to_t=-1, newfig=True):
+def w_diff_figure(connections, w_monitor, from_t=0, to_t=-1, newfig=True):
+    
     if newfig:
         plt.figure()
     else:
         plt.clf()
-    plt.subplot(n_neurons, 1, 1)
-    plt.title('Progresion de pesos para cada neurona')
-    plt.figure()
     neurons = set(connections.j)
-    n_neurons = len(neurons)
-    for i in range(12):
-        plt.subplot(12, 1, i+1)
-        relevant_weights = connections['input-layer1e'].j == i
-        weights = np.array(connections['input-layer1e'].w)[relevant_weights]
-        plt.plot(weights, color= 'red')
-        plt.ylim([0, 1])
+    num_neurons = len(neurons)
+
+    plt.subplot(num_neurons, 1, 1)
+    plt.title('Ajustes de peso para cada neurona')
+
+    # Donde el tiempo del monitor de los pesos es mayor de 0s
+    from_i = np.where(w_monitor.t >= from_t * b2.second)[0][0]
+    if to_t == -1:
+        to_i = -1
+    else:
+    # Donde el tiempo del monitor de los pesos es menor de -1s
+        to_i = np.where(w_monitor.t <= to_t * b2.second)[0][-1]
+
+    w_diffs = w_monitor.w[:, to_i] - w_monitor.w[:, from_i]
+    max_w_diff = np.max(w_diffs)
+    min_w_diff = np.min(w_diffs)
+
+    # Se guardan las diferencias de  pesos por si quiere trabajar con ellos (al final no se requirieron)
+    # np.savetxt('evaluation/weight_diffs.out', weight_diffs)
+
+    for neuron_n in neurons:
+        plt.subplot(num_neurons, 1, neuron_n+1)
+        important_weights = connections.j == neuron_n
+        diff = w_diffs[important_weights]
+        plt.plot(diff, color='green')
+        plt.ylim([min_w_diff, max_w_diff])
         plt.yticks([])
         plt.xticks([])
-        plt.ylabel("%d" % i)
-    plt.savefig('evaluation/weights.png')'''
+        plt.ylabel("%d" % neuron_n)
+
+# Definicion de las gráficas para mostrar el comportamiento de distintos parámetros por si se quiere
+# trabajar con ellos en un futuro: potencial de membrana, corriente, threshold...
+
+def params_figures(monitor, state_vals, firing_neurons, title):
+   
+    plt.figure()
+    n_fir_n = len(firing_neurons)
+    min_val = float('inf')
+    max_val = -float('inf')
+
+    for i, neuron_n in enumerate(firing_neurons):
+        plt.subplot(n_fir_n, 1, i+1)
+        n_val = state_vals[neuron_n, :]
+        neuron_val_min = np.amin(n_val)
+        if neuron_val_min < min_val:
+            min_val = neuron_val_min
+        neuron_val_max = np.amax(n_val)
+        if neuron_val_max > max_val:
+            max_val = neuron_val_max
+        plt.plot(monitor.t, n_val)
+        plt.ylabel("N. %d" % neuron_n)
+
+    for i, _ in enumerate(firing_neurons):
+        plt.subplot(n_fir_n, 1, i+1)
+        plt.ylim([min_val, max_val])
+        plt.yticks([min_val, max_val])
+
+    for i in range(len(firing_neurons)-1):
+        plt.subplot(n_fir_n, 1, i+1)
+        plt.xticks([])
+    plt.subplot(n_fir_n, 1, 1)
+    plt.title(title)
