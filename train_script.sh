@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Ejecutando este script se genera y se guarada en un archivo .txt las simulaciones delos entrenamientos
+# Ejecutando este script se genera y se guarada en un archivo .txt las simulaciones de los entrenamientos
 
 python_file="snn.py" # Script que contiene la SNN
 folder_input_spikes="spikes_inputs_train" #Carpeta de donde debe coger los .pickle como entrada a la red
