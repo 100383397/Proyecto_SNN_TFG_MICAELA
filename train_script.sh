@@ -1,10 +1,17 @@
 #!/bin/bash
 
-python_file="snn.py"
-folder_input_spikes="spikes_inputs_train"
-folder_output_weights="weights_train"
+# Ejecutando este script se genera y se guarada en un archivo .txt las simulaciones delos entrenamientos
+
+python_file="snn.py" # Script que contiene la SNN
+folder_input_spikes="spikes_inputs_train" #Carpeta de donde debe coger los .pickle como entrada a la red
+folder_output_weights="weights_train" #Carpeta donde se guarda el ajuste de pesos finales de cada simulación
+
+# La escala se repite de 1 a 10 veces. Cada audio aumenta en 1 la repetición de la escala que contienen
+# Se van a generar 30 iteraciones, 30 entrenamiento para cada número de repeticiones de la escala
+
 num_rep=10
 max_iter=30
+
 for((i=1; i<=$num_rep; i++))
 do
     echo "/****************************/"
@@ -13,6 +20,6 @@ do
     for((j=1; j<=$max_iter; j++))
         do
         echo "Iter n. ${j}"
-        python3.9 "$python_file" "$folder_input_spikes/scale${i}rep_2.0_s.pickle" "$folder_output_weights/scale${i}rep_${j}iter_2.0_s.pickle" 2.0 >> "out_${i}rep.txt"
+        python3.9 "$python_file" "$folder_input_spikes/scale${i}rep_0.5_s.pickle" "$folder_output_weights/scale${i}rep_${j}iter_0.5_s.pickle" 0.5 >> "out_${i}rep.txt"
         done
 done
