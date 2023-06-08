@@ -60,17 +60,17 @@ spectral_pw_norm = (spectro_pw - pw_min)/pw_range
 
 len = 4
 kernel = np.ones((1, len))
-spectral_input = ndimage.convolve(spectral_pw_norm, kernel)
-spectral_input[spectral_input < 0.8*len] = 0
+spectr_in = ndimage.convolve(spectral_pw_norm, kernel)
+spectr_in[spectr_in < 0.8*len] = 0
 
 plt.figure()
-plt.imshow(spectral_input, aspect='auto', origin='lower')
+plt.imshow(spectr_in, aspect='auto', origin='lower')
 plt.savefig('images/%s_spectral_input.png' % name)
 
 # Ahora se traducen los audios de entrada en una serie de picos mediante Brian2 y se obtiene un 
 # tren de picos de 513 neuronas de entrada que reflejan el contenido espectral de cada nota
 
-audio_input = b2.TimedArray(spectral_input.T, dt=dt)
+audio_input = b2.TimedArray(spectr_in.T, dt=dt)
 
 eqs_model = '''
 dv/dt = (I-v)/(10*ms) : 1
