@@ -29,3 +29,6 @@ son los ficheros que, haciendo uso de la libreria de `mingus`, generan las secue
 
 * `tools`  contiene módulos empleados para la simulación (funciones que definen los grupos neuronales, los procesos de sinapsis y el análisis de los datos de salida y su representación).
 
+* `snn.py` script principal de la simulación que se ejecutará a travez de los ficheros `train_script.sh` y `validation_script.sh` (ver isntrucciones de ejecución de la simulación más abajo).
+
+* `weigths_train` almacena todos los archivos `.pickle` que contienen los pesos finales de cada uno de los entrenamientos realizados. Y el archivo `weights.pickle` situado fuera de esta carpeta son los pesos congelados empleados para las simulaciones del proyecto.
