@@ -32,3 +32,25 @@ son los ficheros que, haciendo uso de la libreria de `mingus`, generan las secue
 * `snn.py` script principal de la simulación que se ejecutará a travez de los ficheros `train_script.sh` y `validation_script.sh` (ver isntrucciones de ejecución de la simulación más abajo).
 
 * `weigths_train` almacena todos los archivos `.pickle` que contienen los pesos finales de cada uno de los entrenamientos realizados. Y el archivo `weights.pickle` situado fuera de esta carpeta son los pesos congelados empleados para las simulaciones del proyecto.
+
+* `Results` carpeta que contiene todos los resultados obtenidos . En concreto, en la carpeta `images` se recogen todas las figuras generadas durante el procesado del audio y la generación de los trenes de picos iniciales (el espectrograma en escala de mel y su traducción a picos mediante Brian 2) y en la carpeta `figures` se recogen aquellas figuras obtenidas a la salida tras la simulación del entrenamiento y las validaciones realizadas.
+
+* Se ingluye material adicional en la carpeta de `Results`:
+
+** `TRAIN_RESULTS.xlsx` y `VALIDATION_RESULTS.xlsx` recogen en tablas todos los resultados obtenidos de los 900 entrenamientos y las 180 validaciones (tasas de éxito, de fallo, medias y desviaciones típicas).
+
+
+
+## Ejecución de la simulación
+
+Para traducir y generar los trenes de picos de los archivos de audio, que serán introducidos como entrada a la red neuronal, se debe ejecutar el siguiente comando:
+
+`$ python3.9 audio_spikes_input_melspectrogram.py audios_validation/scale7oct5_0.5_s.wav`
+
+Para ejecutar el número deseado de simulaciones del entrenamiento y grabar los resultados obtenidos en un fichero de texto, se emplea la siguiente orden:
+
+`$ sh train_script.sh`
+
+Para realizar las simulaciones de las validaciones y almacenar sus resultados, ejecutar la siguiente línea de comando:
+
+`$ sh validation_script.sh`
