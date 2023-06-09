@@ -18,3 +18,14 @@ Además se necesitará:
 
 ## Archivos
 
+* `audios_train` y `audios_validation` contienen las secuencias de audio, en archivos `.wav`, empleadas para el entrenamiento y la validación de la red neuronal. 
+
+* `audio_chords_input.py` y `audio_notes_input.py`  
+son los ficheros que, haciendo uso de la libreria de `mingus`, generan las secuencias de audio mediante los archivos de sonido `.sf2` contenidos en la carpeta denominada `soundfonts`.
+
+* `audio_spikes_input_melspectrogram.py` es el script empleado para procesar el audio de entrada y convertirlo a trenes de picos para introducirlo a la red. `audio_spikes_input_spectrogram.py` y `audio_spikes_input_chromaQconstant.py` son scripts adicionales de otros procesados del audio probados.
+
+* `spikes_input_train` y `spikes_input_validation` son las carpetas que contienen los archivos `.pickle` que contienen la información de los trenes de picos de las neuronas para introducirlo como entrada a la red neuronal.
+
+* `tools`  contiene módulos empleados para la simulación (funciones que definen los grupos neuronales, los procesos de sinapsis y el análisis de los datos de salida y su representación).
+
