@@ -1,2 +1,2 @@
-# Proyecto_SNN_TFG_MICAELA
+# Computación bio-inspiada para aplicaciones musicales 
 Trabajo de Fin de Grado. Spiking Neuronal Networks.
