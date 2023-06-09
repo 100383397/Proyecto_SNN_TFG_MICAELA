@@ -16,7 +16,7 @@ import tools.analysis as a_mode
 # Primero se recogen y se definen los parametros usados para: neuronas, conexiones, monitores y
 # para la ejecución de la simulación.
 
-neurons_vars = {}
+neurons_vars = {} # Variables ecuaciones grupos neuronales
 
 neurons_vars['resting_pot_E'] = -66 * b2.mV # Pot reposo excitatoria (E)
 neurons_vars['resting_pot_I'] = -61 * b2.mV # Pot reposo inhibitoria (I)
@@ -40,14 +40,14 @@ neurons_vars['max_theta'] = 60.0 * b2.mV
 neurons_vars['offset'] = 20 * b2.mV
 neurons_vars['theta_coef'] = 0.02
 
-connect_vars = {} #variables de STDP
+connect_vars = {} # Variables de STDP
 
-connect_vars['tau_pre'] = 20 * b2.ms
-connect_vars['tau_post'] = 20 * b2.ms
-connect_vars['nu_pre'] = 0.0001
-connect_vars['nu_post'] = 0.02
-connect_vars['wmax'] = 1.0
-connect_vars['pre_w_decrease'] = 0.00025
+connect_vars['tau_pre'] = 20 * b2.ms # cte t presinaptina
+connect_vars['tau_post'] = 20 * b2.ms # cte t postsinaptica
+connect_vars['nu_pre'] = 0.0001 # tasa aprendizaje presinaptica
+connect_vars['nu_post'] = 0.02 # tasa aprendizaje postsinaptica
+connect_vars['wmax'] = 1.0 
+connect_vars['pre_w_decrease'] = 0.00025 # disminución w presinaptico
 connect_vars['min_theta'] = 0 * b2.mV
 connect_vars['max_theta'] = 60 * b2.mV
 connect_vars['theta_coef'] = 0.02
@@ -98,6 +98,7 @@ def load_audio_input(run_vars):
 
     return spikes
 
+
 # Se inicializan los grupos de neuronas excitatorias de entrada, salida y las inhibidoras
 
 def initialize_neurons(input_spk, layer_n_neurons, neurons_vars):
@@ -125,6 +126,7 @@ def initialize_neurons(input_spk, layer_n_neurons, neurons_vars):
     )
 
     return neurons
+
 
 # Se inicializan las conexiones sinapticas entre los grupos de neuronas
 
@@ -175,9 +177,10 @@ def initialize_conn(neurons, connect_vars):
 
     return conns
 
+
 # Función para monitorizar las variables de estado en la red neuronal mediante objetos de Brian 2
 
-def variable_monitors(neurons, connections, mon_vars):
+def variable_monitors(neurons, conns, mon_vars):
 
     mon = {
         'spikes': {}, # Para monitorizar y registrar los picos (spikes, con SpikeMonitor)
@@ -200,26 +203,27 @@ def variable_monitors(neurons, connections, mon_vars):
         dt=t_step
     )
 
-    conn = connections['input-layer1e']
+    conn = conns['input-layer1e']
     n_conns = len(conn.target) * len(conn.source)
 
     mon['connections']['input-layer1e'] = b2.StateMonitor(
-        connections['input-layer1e'],
+        conns['input-layer1e'],
         ['w', 'post', 'pre'],
         record=range(n_conns),
         dt=t_step
     )
     return mon
 
+
 # Función para ejecutar la simulación de la red neuronal con los objetos creados hasta el momento
 
-def run_simulation(run_vars, neurons, connections, monitors):
+def run_simulation(run_vars, neurons, conns, monitors):
 
     net = b2.Network()
     for group in neurons:
         net.add(neurons[group])
-    for connection in connections:
-        net.add(connections[connection])
+    for connection in conns:
+        net.add(conns[connection])
     for mon_type in monitors:
         for neuron_group in monitors[mon_type]:
             net.add(monitors[mon_type][neuron_group])
@@ -230,7 +234,7 @@ def run_simulation(run_vars, neurons, connections, monitors):
 
 # Función para evaluar los parámetros, gráfica y analisis de los resultados
 
-def data_analysis(mon, connections):
+def data_analysis(mon, conns):
 
     if len(mon['spikes']['layer1e']) == 0:
         print("No se detectaron picos; no hay analisis")
@@ -245,40 +249,43 @@ def data_analysis(mon, connections):
         from_t=start_time,
         to_t=end_time,
         note_t = analysis_vars['note_length'], # Distancia entre las notas en segundos
-        n_notes = analysis_vars['n_notes'] # Numero de notas en el audio declarado al principio del script
+        n_notes = analysis_vars['n_notes'] # Numero de notas en el audio, declarado al principio del script
     )
 
-    #Para calcular la media y la varianza del entrenamiento y caracterizar asi el sistema implementado
-    #se va a realizar, para la media, un sumatorio de los indices / numero de indices totales
-    #La media es razonable entorno a 6, ya que hay 12 notas, lo suyo seria que estuviera en el medio.
-    #TODAS LAS NOTAS SON IGUAL DE EQUIPROBABLES.
-    # Se espera que para distintas duraciones de las notas, a mayor tiempo entre notas si la dispersion es
-    # mas alta, es menos fiable, y si es mas baja lo contrario.
+    # Para calcular la media y la varianza del entrenamiento y caracterizar asi el sistema,
+    # se va a calcular la media y varianza de los índices de la capa excitatoria de salida
+    # La media es razonable entorno a 5.5, ya que hay 12 notas (indices de 0 a 11).
+    # (Se espera que para distintas duraciones de las notas, a mayor tiempo entre notas si 
+    # la dispersion es mas alta, es menos fiable, y si es mas baja lo contrario).
 
     mean_i = np.mean(mon['spikes']['layer1e'].i)
     var_i = np.var(mon['spikes']['layer1e'].i)
     std_i = np.std(mon['spikes']['layer1e'].i)
+
     print("La media calculada en función de los indices es: %f"%( mean_i))
     print("La varianza resultante es: %f" %( var_i))
     print("La desviacion tipica resultante es: %f" %( std_i))
     
     plt.ion()
 
+    # Representación de spikes de entrada y salida, umbral, corriente, potencial de membrana y
+    # ajuste de pesos para cada neurona
+
     plt.figure()
 
     plt.subplot(2, 1, 1)
-    plt.title("Input spikes")
+    plt.title("Spikes de entrada")
     plt.plot(
         mon['spikes']['input'].t/b2.second,
         mon['spikes']['input'].i,
         'k.',
         markersize=2
     )
-    plt.ylabel("Neuron no.")
+    plt.ylabel("Neurona nº.")
     plt.grid()
 
     plt.subplot(2, 1, 2)
-    plt.title("Output spikes")
+    plt.title("Spikes de salida")
     plt.plot(
         mon['spikes']['layer1e'].t/b2.second,
         mon['spikes']['layer1e'].i,
@@ -287,46 +294,48 @@ def data_analysis(mon, connections):
     )
     plt.ylim([-1, max(mon['spikes']['layer1e'].i)+1])
     plt.grid()
-    plt.ylabel("Neuron no.")
-
-    plt.xlabel("Time (seconds)")
+    plt.ylabel("Neurona nº.")
+    plt.xlabel("Tiempo (s)")
     plt.tight_layout()
 
-    firing_neurons = set(mon['spikes']['layer1e'].i)
+    fir_neurons = set(mon['spikes']['layer1e'].i)
 
     a_mode.params_figures(
         mon['neurons']['layer1e'],
         mon['neurons']['layer1e'].ge/b2.siemens,
-        firing_neurons,
-        'Current'
+        fir_neurons,
+        'Corrinete'
     )
     a_mode.params_figures(
         mon['neurons']['layer1e'],
         mon['neurons']['layer1e'].theta/b2.mV,
-        firing_neurons,
-        'Threshold increase'
+        fir_neurons,
+        'Aumento del umbral'
     )
     a_mode.params_figures(
         mon['neurons']['layer1e'],
         mon['neurons']['layer1e'].v/b2.mV,
-        firing_neurons,
-        'Membrane potential'
+        fir_neurons,
+        'Potencial de membrana'
     )
 
     a_mode.w_diff_figure(
-        connections['input-layer1e'],
+        conns['input-layer1e'],
         mon['connections']['input-layer1e']
     )
 
-#########################################################################
 
-spike_filename = os.path.basename(run_vars['input_spikes_filename'])
-run_id = spike_filename.replace('.pickle', '')
-input_spikes = load_audio_input(run_vars)
-input_end_time = np.ceil(np.amax(input_spikes['times']))
+# Inicialización de la simulación y ejecución de las funciones definidas previamente
+
+spk_filename = os.path.basename(run_vars['input_spikes_filename'])
+run_id = spk_filename.replace('.pickle', '')
+in_spk = load_audio_input(run_vars)
+in_end_t = np.ceil(np.amax(in_spk['times']))
 
 if 'run_time' not in run_vars:
-    run_vars['run_time'] = input_end_time
+    run_vars['run_time'] = in_end_t
+
+# Si se quier generar el código en C++ cambiar a false la variable run_vars['no_standalone'] al principio
 
 if not run_vars['no_standalone']:
     if os.name == 'nt':
@@ -336,50 +345,45 @@ if not run_vars['no_standalone']:
     build_dir += run_id
     b2.set_device('cpp_standalone', directory=build_dir)
 
-print("Inicializando neuronas...")
-neurons = initialize_neurons(
-    input_spikes, run_vars['layer_n_neurons'],
-    neurons_vars
-)
-print("¡Listo!")
+# Seguimiento de la simulación y las inicializaciones de los parámetros
 
+print("Inicializando neuronas...")
+neurons = initialize_neurons(in_spk, run_vars['layer_n_neurons'],neurons_vars)
+print("¡Listo!")
 
 print("Inicializando conexiones...")
-connections = initialize_conn(
-    neurons,
-    connect_vars
-)
+conns = initialize_conn(neurons,connect_vars)
 print("¡Listo!")
-
 
 print("Inicializando monitores...")
-monitors = variable_monitors(neurons, connections, mon_vars)
+monitors = variable_monitors(neurons, conns, mon_vars)
 print("¡Listo!")
-
-    
+   
 print("Ejecutando simulacion...")
-net = run_simulation(run_vars, neurons, connections, monitors)
+net = run_simulation(run_vars, neurons, conns, monitors)
 
-guardar = False
+
+guardar = False # Cambiar a True si quiere sobreescribir el archivo de pesos weight.pickle 
 if(guardar== True):
-    weights = np.array(connections['input-layer1e'].w)
-        #guardo los pesos por si necesito trabajar con ellos
-    np.savetxt('evaluation/weights.out', weights)
+    weights = np.array(conns['input-layer1e'].w)
+    #guardo los pesos por si necesito trabajar con ellos
+    #np.savetxt('evaluation/weights.out', weights)
     filename = run_vars['output_spikes_filename']
     with open(filename, 'wb') as pickle_file:
         pickle.dump(weights, pickle_file)
-print("Listo!")
+print("¡Listo!")
 
-def save_figures(name):
+
+def save_figs(name):
     print("Guardando figuras...")
     figs = plt.get_fignums()
     for fig in figs:
         plt.figure(fig)
         plt.savefig('figures/%s_fig_%d.png' % (name, fig))
-    print("Listo!")
+    print("¡Listo!")
 
-data_analysis(monitors,connections)
+data_analysis(monitors,conns)
 
 if analysis_vars['save_figs']:
-        save_figures(run_id)
+        save_figs(run_id)
 
