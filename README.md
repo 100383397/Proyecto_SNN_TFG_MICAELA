@@ -35,10 +35,7 @@ son los ficheros que, haciendo uso de la libreria de `mingus`, generan las secue
 
 * `Results` carpeta que contiene todos los resultados obtenidos . En concreto, en la carpeta `images` se recogen todas las figuras generadas durante el procesado del audio y la generación de los trenes de picos iniciales (el espectrograma en escala de mel y su traducción a picos mediante Brian 2) y en la carpeta `figures` se recogen aquellas figuras obtenidas a la salida tras la simulación del entrenamiento y las validaciones realizadas.
 
-* Se ingluye material adicional en la carpeta de `Results`:
-
-** `TRAIN_RESULTS.xlsx` y `VALIDATION_RESULTS.xlsx` recogen en tablas todos los resultados obtenidos de los 900 entrenamientos y las 180 validaciones (tasas de éxito, de fallo, medias y desviaciones típicas).
-
+* Se ingluye material adicional en la carpeta de `Results`:`TRAIN_RESULTS.xlsx` y `VALIDATION_RESULTS.xlsx` recogen en tablas todos los resultados obtenidos de los 900 entrenamientos y las 180 validaciones (tasas de éxito, de fallo, medias y desviaciones típicas). `proc_data_train.sh` y `proc_data_validation.sh` permiten pasar los datos de la simulación, grabados en un archivo de texto, a formato Excel. `summary note-neuron correspondences.pdf` documento de guía que recoge los índices para las notas de las secuencias de audio empleadas en el entrenamiento y la validación.
 
 
 ## Ejecución de la simulación
