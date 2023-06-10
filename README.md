@@ -25,7 +25,7 @@ son los ficheros que, haciendo uso de la libreria de `mingus`, generan las secue
 
 * `audio_spikes_input_melspectrogram.py` es el script empleado para procesar el audio de entrada y convertirlo a trenes de picos para introducirlo a la red. `audio_spikes_input_spectrogram.py` y `audio_spikes_input_chromaQconstant.py` son scripts adicionales de otros procesados del audio probados.
 
-* `spikes_input_train` y `spikes_input_validation` son las carpetas que contienen los archivos `.pickle` que contienen la información de los trenes de picos de las neuronas para introducirlo como entrada a la red neuronal.
+* `spikes_input_train` y `spikes_input_validation` son las carpetas que contienen los archivos `.pickle` que contienen la información de los trenes de picos de las neuronas de entrada para introducirlos a la red neuronal.
 
 * `tools`  contiene módulos empleados para la simulación (funciones que definen los grupos neuronales, los procesos de sinapsis y el análisis de los datos de salida y su representación).
 
