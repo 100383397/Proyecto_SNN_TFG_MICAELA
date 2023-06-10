@@ -9,12 +9,12 @@ En primer lugar, para poder clonar el repositorio adecuadamente, es necesario in
 
 Además se necesitará:
 
-* Python 3.9.16
+* Python 3.9.16 (otras versiones son compatibles, se recomienda que sean a partir de Python 3)
 * Brian 2 (http://briansimulator.org)
 * NumPy
 * matplotlib
-* Mingus para generar las secuencias de audio manualmente
-* librosa
+* Mingus (librería para generar las secuencias de audio manualmente)
+* librosa (librería para procesar el audio)
 
 ## Archivos
 
