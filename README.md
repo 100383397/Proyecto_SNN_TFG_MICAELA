@@ -29,13 +29,13 @@ son los ficheros que, haciendo uso de la libreria de `mingus`, generan las secue
 
 * `tools`  contiene módulos empleados para la simulación (funciones que definen los grupos neuronales, los procesos de sinapsis y el análisis de los datos de salida y su representación).
 
-* `snn.py` script principal de la simulación que se ejecutará a travez de los ficheros `train_script.sh` y `validation_script.sh` (ver isntrucciones de ejecución de la simulación más abajo).
+* `snn.py` script principal de la simulación que se ejecutará a través de los ficheros `train_script.sh` y `validation_script.sh` (ver instrucciones de ejecución de la simulación más abajo).
 
-* `weigths_train` almacena todos los archivos `.pickle` que contienen los pesos finales de cada uno de los entrenamientos realizados. Y el archivo `weights.pickle` situado fuera de esta carpeta son los pesos congelados empleados para las simulaciones del proyecto.
+* `weigths_train` almacena todos los archivos `.pickle` que contienen los pesos finales de cada uno de los entrenamientos realizados. Y el archivo `weights.pickle`, situado fuera de esta carpeta, es el archivo de pesos congelados empleados para las validaciones del proyecto.
 
-* `Results` carpeta que contiene todos los resultados obtenidos . En concreto, en la carpeta `images` se recogen todas las figuras generadas durante el procesado del audio y la generación de los trenes de picos iniciales (el espectrograma en escala de mel y su traducción a picos mediante Brian 2) y en la carpeta `figures` se recogen aquellas figuras obtenidas a la salida tras la simulación del entrenamiento y las validaciones realizadas.
+* `Results` carpeta que contiene todos los resultados obtenidos. En concreto, en la carpeta `images` se recogen todas las figuras generadas durante el procesado del audio y la generación de los trenes de picos iniciales (el espectrograma en escala de mel y su traducción a picos mediante Brian 2) y en la carpeta `figures` se recogen aquellas figuras obtenidas a la salida tras la simulación del entrenamiento y las validaciones realizadas.
 
-* Se ingluye material adicional en la carpeta de `Results`:`TRAIN_RESULTS.xlsx` y `VALIDATION_RESULTS.xlsx` recogen en tablas todos los resultados obtenidos de los 900 entrenamientos y las 180 validaciones (tasas de éxito, de fallo, medias y desviaciones típicas). `proc_data_train.sh` y `proc_data_validation.sh` permiten pasar los datos de la simulación, grabados en un archivo de texto, a formato Excel. `summary note-neuron correspondences.pdf` documento de guía que recoge los índices para las notas de las secuencias de audio empleadas en el entrenamiento y la validación.
+* Se incluye material adicional en la carpeta de `Results`:`TRAIN_RESULTS.xlsx` y `VALIDATION_RESULTS.xlsx` recogen en tablas todos los resultados obtenidos de los 900 entrenamientos y las 180 validaciones (tasas de éxito, disparos correctos, incorrectos y totales por neurona, medias y desviaciones típicas). `proc_data_train.sh` y `proc_data_validation.sh` permiten pasar los datos de la simulación, grabados en un archivo de texto, a formato Excel. Y `summary note-neuron correspondences.pdf` es un documento guía que recoge los índices correspondientes para las notas de cada secuencia de audio empleadas en el entrenamiento y la validación.
 
 
 ## Ejecución de la simulación
@@ -48,6 +48,6 @@ Para ejecutar el número deseado de simulaciones del entrenamiento y grabar los 
 
 `$ sh train_script.sh`
 
-Para realizar las simulaciones de las validaciones y almacenar sus resultados, ejecutar la siguiente línea de comando:
+Para realizar las simulaciones de las validaciones y almacenar sus resultados, se ejecuta la siguiente línea de comando:
 
 `$ sh validation_script.sh`
