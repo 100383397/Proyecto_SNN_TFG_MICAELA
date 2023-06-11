@@ -45,7 +45,7 @@ dt = (bins[1] - bins[0]) #diferencial de tiempo entre los instantes 1 y 0
 plt.ylabel('Frecuencia (Hz)')
 plt.xlabel('Tiempo (s)')
 plt.title('Espectrograma')
-plt.savefig('images/%s_spectrogram.png' % name)
+plt.savefig('Results/images/%s_spectrogram.png' % name)
 
 # Se pasa a dB y se calcula el espectrograma normalizado (entre 0 y 1)
 
@@ -65,7 +65,7 @@ spectr_in[spectr_in < 0.8*len] = 0
 
 plt.figure()
 plt.imshow(spectr_in, aspect='auto', origin='lower')
-plt.savefig('images/%s_spectral_input.png' % name)
+plt.savefig('Results/images/%s_spectral_input.png' % name)
 
 # Ahora se traducen los audios de entrada en una serie de picos mediante Brian2 y se obtiene un 
 # tren de picos de 513 neuronas de entrada que reflejan el contenido espectral de cada nota.
@@ -105,4 +105,4 @@ plt.ylim([0, num_freqs])
 plt.ylabel('Numero de neuronas aferentes')
 plt.xlabel('Tiempo (s)')
 plt.title('Spike Monitor de neuronas de entrada')
-plt.savefig('images/spectrogram_%s_spikes.png' % name)
+plt.savefig('Results/images/spectrogram_%s_spikes.png' % name)
