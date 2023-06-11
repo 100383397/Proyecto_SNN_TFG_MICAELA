@@ -44,7 +44,7 @@ plt.xlabel('Tiempo (s)')
 plt.colorbar(format='%+2.0f dB')
 plt.title('Cromagrama de Q constante')
 plt.tight_layout()
-plt.savefig('images/%s_chroma_cq.png' % name)
+plt.savefig('Results/images/%s_chroma_cq.png' % name)
 
 #Calculamos el cromagrama normalizado (entre 0 y 1)
 
@@ -63,7 +63,7 @@ chroma_spectr_in[chroma_spectr_in < 0.65*kernel_len] = 0
 
 plt.figure()
 plt.imshow(chroma_spectr_in, aspect='auto', origin='lower')
-plt.savefig('images/%s_chroma_cq_spectral_input.png' % name)
+plt.savefig('Results/images/%s_chroma_cq_spectral_input.png' % name)
 
 # Ahora se traducen los audios de entrada en una serie de picos mediante Brian2
 
@@ -102,4 +102,4 @@ plt.ylim([0, n_bins])
 plt.ylabel('Numero de neuronas aferentes')
 plt.xlabel('Tiempo (s)')
 plt.title('Spike Monitor de neuronas de entrada')
-plt.savefig('images/chroma_cq_%s_spikes.png' % name)
+plt.savefig('Results/images/chroma_cq_%s_spikes.png' % name)
