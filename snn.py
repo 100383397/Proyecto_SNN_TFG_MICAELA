@@ -379,7 +379,7 @@ def save_figs(name):
     figs = plt.get_fignums()
     for fig in figs:
         plt.figure(fig)
-        plt.savefig('figures/%s_fig_%d.png' % (name, fig))
+        plt.savefig('Results/figures/%s_fig_%d.png' % (name, fig))
     print("¡Listo!")
 
 data_analysis(monitors,conns)
