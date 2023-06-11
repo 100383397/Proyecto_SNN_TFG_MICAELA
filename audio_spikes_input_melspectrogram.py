@@ -47,7 +47,7 @@ plt.xlabel('Tiempo (s)')
 plt.colorbar(format='%+2.0f dB')
 plt.title('Espectrograma a escala de Mel')
 plt.tight_layout()
-plt.savefig('images/%s_melspectrogram.png' % name)
+plt.savefig('Results/images/%s_melspectrogram.png' % name)
 
 #Calculamos el espectrograma en escala de mel normalizado (entre 0 y 1)
 
@@ -66,7 +66,7 @@ mel_spectr_in[mel_spectr_in < 0.55*len] = 0
 
 plt.figure()
 plt.imshow(mel_spectr_in, aspect='auto', origin='lower')
-plt.savefig('images/%s_melspectrogram_spectral_input.png' % name)
+plt.savefig('Results/images/%s_melspectrogram_spectral_input.png' % name)
 
 # Ahora se traducen los audios de entrada en una serie de picos mediante Brian2 y se obtiene un 
 # tren de picos de 512 neuronas de entrada que reflejan el contenido espectral de cada nota
@@ -106,4 +106,4 @@ plt.ylim([0, n_mels])
 plt.ylabel('Numero de neuronas aferentes')
 plt.xlabel('Tiempo (s)')
 plt.title('Spike Monitor de neuronas de entrada')
-plt.savefig('images/melscale_%s_spikes.png' % name)
+plt.savefig('Results/images/melscale_%s_spikes.png' % name)
