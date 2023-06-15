@@ -39,7 +39,9 @@ Además se necesitará:
 
 ## Ejecución de la simulación
 
-Para traducir y generar los trenes de picos de los archivos de audio, que serán introducidos como entrada a la red neuronal, se debe ejecutar el siguiente comando:
+Para traducir y generar los trenes de picos de los archivos de audio, que serán introducidos como entrada a la red neuronal, se debe ejecutar el siguiente comando para los audios del entrenamiento, y de la validación respectivamente:
+
+`$ python3.9 audio_spikes_input_melspectrogram.py audios_train/scale3rep_1.0_s.wav`
 
 `$ python3.9 audio_spikes_input_melspectrogram.py audios_validation/ACORDES_VAL3/chords1_0.5_s.wav`
 
