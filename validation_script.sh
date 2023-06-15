@@ -13,4 +13,4 @@ folder_output_weights="weights_train" #no se emplea
 # Hay que modificar el parámetro final que indica la duración de nots del audio introducido, ya sea
 # 0.5, 1.0 o 2.0 
 
-python3.9 "$python_file" "$folder_input_spikes/chords0_0.5_s.pickle" "$folder_output_weights/scale${i}rep_${j}iter_1.0_s.pickle" 0.5 >> "out_info.txt"
+python3.9 "$python_file" "$folder_input_spikes/scale12Trumpet_0.5_s.pickle" "$folder_output_weights/scale${i}rep_${j}iter_1.0_s.pickle" 0.5 >> "out_info.txt"
