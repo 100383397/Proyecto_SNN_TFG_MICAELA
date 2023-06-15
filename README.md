@@ -47,7 +47,7 @@ Para traducir y generar los trenes de picos de los archivos de audio, que serán
 
 Para ejecutar el número deseado de simulaciones del entrenamiento y grabar los resultados obtenidos en un fichero de texto, se emplea la siguiente orden:
 
-`$ sh train_script.sh`
+`$ bash train_script.sh`
 
 Para realizar las simulaciones de las validaciones y almacenar sus resultados, se ejecuta la siguiente línea de comando:
 
