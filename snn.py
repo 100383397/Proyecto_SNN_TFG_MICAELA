@@ -70,7 +70,7 @@ analysis_vars = {}
 analysis_vars['save_figs'] = True
 analysis_vars['note_length'] = float(sys.argv[3]) #0.5, 0.1 o 0.2
 
-analysis_vars['n_notes'] = 5 # Numero de notas contenidas en cada audio.
+analysis_vars['n_notes'] = 12 # Numero de notas contenidas en cada audio.
 
 # Debe modificarse para cada ejecucion en función de la secuencia de audio introducida, entre 
 # parentesis se muestran a continuación el numero que se debe poner para cada audio:
