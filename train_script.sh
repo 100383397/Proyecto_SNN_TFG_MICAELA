@@ -9,7 +9,7 @@ folder_output_weights="weights_train" #Carpeta donde se guarda el ajuste de peso
 # La escala se repite de 1 a 10 veces. Cada audio aumenta en 1 la repetición de la escala que contienen
 # Se van a generar 30 iteraciones, 30 entrenamiento para cada número de repeticiones de la escala.
 
-num_rep=10
+num_rep=1
 max_iter=30
 
 # Hay que cambiar el tiempo definido del archivo de los input spikes que se desee probar
