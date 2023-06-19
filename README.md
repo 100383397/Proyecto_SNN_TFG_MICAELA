@@ -1,6 +1,6 @@
-# Computación bio-inspiada para aplicaciones musicales 
+# Computación bio-inspirada para aplicaciones musicales.
 
-Este repositorio contiene todo el código fuente empleado para la elaboración del Trabajo de Fin de Grado titulado "Computación bio-inspiada para aplicaciones musicales". También se incluyen todos los datos y figuras obtenidos como resultado de las distintas simulaciones planteadas.
+Este repositorio contiene todo el código fuente empleado para la elaboración del Trabajo de Fin de Grado titulado "Computación bio-inspirada para aplicaciones musicales". También se incluyen todos los datos y figuras obtenidos como resultado de las distintas simulaciones planteadas.
 
 ## Requerimientos
 
